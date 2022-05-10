@@ -10,6 +10,7 @@
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
         <!-- Google fonts-->
+        <script src="https://code.jquery.com/jquery-1.12.4.min.js"integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="crossorigin="anonymous"></script>
         <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
 
@@ -27,10 +28,50 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="/consumofontic/">Inicio</a>                
+                <a class="navbar-brand" href="/consumos_fontic/">Inicio</a>                
             </div>
         </nav>
         <!-- End Navigation-->
+
+        <!-- prueba div2 cargando -->
+        <style>
+
+                    .preloader_r {
+                       position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;
+                       z-index: 9999;
+                       background-image: url('cargando.gif');
+                       background-repeat: no-repeat; 
+                       background-color: #c7d3e3b3;
+                       background-position: center;
+                    }
+        </style>
+
+                    </head>
+                        <body>
+
+                    <!-- // preloads -->
+
+                    <body>
+
+                    <div class="preloader_r"></div>
+
+                    <!-- // preloads -->
+                <script>
+                        $(window).load(function() {
+                       $('.preloader_r').fadeOut('slow');
+                    });
+                </script>
+                    <!-- end preloader cargador-->
+
+                    <!--Fin carga gif -->
+        <!-- fin prueba 2 cargando-->
+
+
+
       
         <header class="masthead">
 

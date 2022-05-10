@@ -27,7 +27,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="/consumofontic/">Inicio</a>                
+                <a class="navbar-brand" href="/consumos_fontic/">Inicio</a>                
             </div>
         </nav>
         <!-- End Navigation-->
@@ -36,11 +36,56 @@
 
         <!-- div cargando -->
 
-        <div id="esperando" style="display: none; text-align: center; position: absolute; left: 50px; top: 50px; width: 1000px; height: 800px;"> 
+<!--         <div id="esperando" style="display: none; text-align: center; position: absolute; left: 50px; top: 50px; width: 1000px; height: 800px;   background-size: auto; "> 
             <img src="cargando.gif">
-        </div>
+         </div> -->
 
         <!--fin div cargando -->
+
+        <div id="esperando"></div>
+
+
+
+        <!-- prueba div2 cargando -->
+        <style>
+
+                    .preloader {
+                       position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;
+                       z-index: 9999;
+                       background-image: url('cargando.gif');
+                       background-repeat: no-repeat; 
+                       background-color: #c7d3e3b3;
+                       background-position: center;
+                    }
+        </style>
+
+                    </head>
+                        <body>
+
+                    <!-- // preloads -->
+
+                    <body>
+
+                    <div class="preloader"></div>
+
+                    <!-- // preloads -->
+                <script>
+                        $(window).load(function() {
+                       $('.preloader').fadeOut('slow');
+                    });
+                </script>
+                    <!-- end preloader cargador-->
+
+                    <!--Fin carga gif -->
+        <!-- fin prueba 2 cargando-->
+
+
+
+
       
         <header class="masthead">
 
@@ -59,8 +104,10 @@
                         <!--dropddowon box seleccionar  -->
                        
                         
+                        <!--fin dropddowon box seleccionar  -->
+                        <form id="importando" role="form" enctype="multipart/form-data">
 
-                        <select id="tipo_insercion" name="select" class="btn btn-warning">
+                        <select id="tipo_insercion" name="tipo_insercion" class="btn btn-warning">
                           <option value="0" selected>Archivo Nuevo</option>
                           <option value="1" >Rectificacion </option>
                         </select>
@@ -70,12 +117,10 @@
 
 
 
-                        <!--fin dropddowon box seleccionar  -->
-                        <form role="form">
                             <div class="form-group">
                                 <div class="btn btn-light">
                                 <label for="archivo_dashboard">Adjuntar archivo .CSV  &#129094; </label>
-                                <input type="file" id="archivo_dashboard">
+                                <input type="file" id="archivo_dashboard" name="archivo_dashboard">
                                 <button id="importar_tigo" type="button" class="btn btn-dark">Cargar Archivo</button>
                              </div>    
                         </form>

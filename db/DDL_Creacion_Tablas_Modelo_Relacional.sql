@@ -56,7 +56,7 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `archivos_claro` (
   `id_archivo_claro` INT NOT NULL AUTO_INCREMENT,
   `nombre_archivo` VARCHAR(200) NOT NULL,
-  `tipo_consumo` INT NOT NULL,
+  `tipo_consumo` INT,
   `fecha_cargue` DATETIME NOT NULL,
   `fecha_procesamiento` DATETIME,
   `cantidad_insertados` INT NOT NULL DEFAULT 0,

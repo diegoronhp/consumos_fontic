@@ -24,17 +24,27 @@ CLASE PARA LA GESTION DE LOS CONSUMOS DE LAS LINEAS TELEFONICAS
         }
 
         public function insertar($query){
-        	//echo "ENTRO AL METODO insertar (Consumo) CON EL query = ".$query."<br>";
             return $this->bd->insert($query);
         }
 
+        public function actualizar($query){
+            return $this->bd->update($query);
+        }
+
+        public function eliminar($query){
+            return $this->bd->delete($query);
+        }
+
         function consultar_campos($query) {
-        	//echo "ENTRO AL METODO consultar_campos con el query = ".$query."<br>";
         	return $this->bd->consulta_punt($query);
             // $rs = mysqli_query($con, $query);
             // $num_rows = mysqli_num_rows($rs);
             // $row = ($num_rows != 0)?mysqli_fetch_array($rs):"";
             // return $row;
+        }
+
+        function get_conection(){
+            return $this->bd->get_con();
         }
 
     }

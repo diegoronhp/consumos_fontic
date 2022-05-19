@@ -90,7 +90,7 @@ class Database {
     }
 
     public function update($query){
-        print_r($query);
+        //print_r($query);
         mysqli_query($this->con, $query);
 
     }
@@ -101,6 +101,10 @@ class Database {
 
     public function error(){
         mysqli_error($this->con);
+    }
+
+    public function get_con(){
+        return $this->con;
     }
 
 }

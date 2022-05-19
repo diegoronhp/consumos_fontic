@@ -81,12 +81,16 @@ CREATE TABLE IF NOT EXISTS `archivos_tigo` (
   `nombre_archivo` VARCHAR(200) NOT NULL,
   `fecha_cargue` DATETIME NOT NULL,
   `fecha_procesamiento` DATETIME,
-  `cantidad_insertados` INT NOT NULL DEFAULT 0,
-  `cantidad_analizados` INT NOT NULL DEFAULT 0,
+  `cant_insertados_voz` INT NOT NULL DEFAULT 0,
+  `cant_insertados_datos` INT NOT NULL DEFAULT 0,
+  `cant_analizados` INT NOT NULL DEFAULT 0,
+  `cant_rechazados` INT NOT NULL DEFAULT 0,
   `tipo_archivo` INT NOT NULL,
-  `id_inicial` INT NOT NULL DEFAULT 0,
-  `id_final` INT NOT NULL DEFAULT 0,
   `tipo_insercion` INT NOT NULL,
+  `id_inicial_voz` INT NOT NULL DEFAULT 0,
+  `id_final_voz` INT NOT NULL DEFAULT 0,
+  `id_inicial_datos` INT NOT NULL DEFAULT 0,
+  `id_final_datos` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id_archivo_plataforma`)
 )
 ENGINE = InnoDB;
@@ -104,6 +108,8 @@ CREATE TABLE IF NOT EXISTS `consumos_voz` (
   `cantidad_consumo` DOUBLE NOT NULL,
   `fecha_consumo` DATE NOT NULL,
   `numero_linea` BIGINT NOT NULL,
+  `id_archivo_claro` INT NOT NULL DEFAULT 0,
+  `id_archivo_tigo_dash` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id_consumo`),
   FOREIGN KEY (`numero_linea`) REFERENCES `lineas_registradas`(`numero_linea`)
 )
@@ -122,6 +128,8 @@ CREATE TABLE IF NOT EXISTS `consumos_datos` (
   `cantidad_consumo` DOUBLE NOT NULL,
   `fecha_consumo` DATE NOT NULL,
   `numero_linea` BIGINT NOT NULL,
+  `id_archivo_claro` INT NOT NULL DEFAULT 0,
+  `id_archivo_tigo_dash` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id_consumo`),
   FOREIGN KEY (`numero_linea`) REFERENCES `lineas_registradas`(`numero_linea`)
 )
@@ -129,24 +137,6 @@ ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
--- -----------------------------------------------------
--- Table `consumos_periodo`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `consumos_periodo` ;
-
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `consumos_periodo` (
-  `id_consumo_periodo` INT NOT NULL AUTO_INCREMENT,
-  `periodo_anio_mes` VARCHAR(45) NOT NULL,
-  `consumo_voz` DOUBLE NOT NULL,
-  `consumo_datos` DOUBLE NOT NULL,
-  `numero_linea` BIGINT NOT NULL,
-  PRIMARY KEY (`id_consumo_periodo`),
-  FOREIGN KEY (`numero_linea`) REFERENCES `lineas_registradas`(`numero_linea`)
-)
-ENGINE = InnoDB;
-
-SHOW WARNINGS;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

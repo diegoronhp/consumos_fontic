@@ -5,6 +5,7 @@ error_reporting(0);
 require_once('../vendor/php-excel-reader/excel_reader2.php');
 require_once('../vendor/SpreadsheetReader.php');
 require '../controller/ConsumoController.php';
+require '../views/envio_correos.php';
 
 
 if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
@@ -42,12 +43,14 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
                 $insertado = insertar_nombre_archivo_consumo_tigo($nombre_archivo,$tipo_archivo,$tipo_insercion);
 
                 if($insertado){
-                    //echo "EL NUEVO ARCHIVO **SI** FUE INSERTADO EN LA BD";
-                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito";
+                    //echo "EL NUEVO ARCHIVO **SI** FUE INSERTADO EN LA BD"."<br>";
+                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito. ";
                     $ruta_archivo = $targetPath.$nombre_archivo;
                     $movido = move_uploaded_file($nombre_temporal, $ruta_archivo);
-                    //echo "EL ARCHIVO HA SIDO MOVIDO ?";
+                    //echo "EL ARCHIVO HA SIDO MOVIDO? ";
                     //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
+                    $mensaje .= insertar_registros_consumos_archivo($nombre_archivo);
+                    enviar_correo_usuario($mensaje);
                 }else{
                     //echo "EL NUEVO ARCHIVO **NO** FUE INSERTADO EN LA BD";
                     $mensaje = "El archivo (".$nombre_archivo.") no pudo ser insertado en la base de datos, por favor intente de nuevo";
@@ -77,7 +80,7 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
 
                 if($insertado){
                     //echo "EL ARCHIVO RECTIFICADO **SI** FUE INSERTADO EN LA BD";
-                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito para su rectificacion";
+                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito para su rectificacion. ";
                     $ruta_archivo = $targetPath_Rectif.$nombre_archivo;
                     move_uploaded_file($nombre_temporal, $ruta_archivo);
                 }else{

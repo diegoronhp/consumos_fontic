@@ -47,7 +47,7 @@ $(function(){
                 }
             })
         }else{
-            var respuesta = "Primero debe seleccionar un archivo de su PC y presioanr el boton Cargar Archivo";
+            var respuesta = "Primero debe seleccionar un archivo de su PC y presionar el boton Cargar Archivo";
             $("#mensaje").text(respuesta);
             $("#respuesta").prop('style','display: block');
             $("#esperando").removeClass('preloader');
@@ -93,7 +93,7 @@ $(function(){
                 }
             })
         }else{
-            var respuesta = "Primero debe seleccionar un archivo de su PC y presioanr el boton Cargar Archivo";
+            var respuesta = "Primero debe seleccionar un archivo de su PC y presionar el boton Cargar Archivo";
             $("#mensaje").text(respuesta);
             $("#respuesta").prop('style','display: block');
             $("#esperando").removeClass('preloader');

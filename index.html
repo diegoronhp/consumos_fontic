@@ -12,6 +12,12 @@
         <!-- Google fonts-->
         <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+
+
+
+ 
+
+
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="index/css/styles.css" rel="stylesheet" />
     </head>
@@ -21,11 +27,23 @@
             <div class="container px-4 px-lg-5">
                 <a class="navbar-brand" href="/consumos_fontic/">Inicio</a>                
             </div>
+
+
+
+
+
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+            <small> <ul class="navbar-nav ms-auto">
+                <br>
+                
+           <a class="btn btn-warning btn-sm" href="views/GestionLineas.php">Gestionar Lineas</a></small> </ul>
+        </div>
         </nav>
+
+        
         <!-- End Navigation-->
 
         
-
 
       
         <header class="masthead">
@@ -40,14 +58,31 @@
 
                         <div align="center"><img src="index/assets/img/tigo.png" width="170" height="130"></div>
 
-                        <h1 class="mx-auto my-3 text-uppercase">Consumos lineas Mintic</h1>
+                        
                         <br>
                         <a class="btn btn-danger" href="views/ConsumoClaro.php">Carga Consumos Claro</a>   
                         <a class="btn btn-info" href="views/ConsumoDash.php">Carga Consumo Dashboard Tigo</a>    
                         <a class="btn btn-white" href="views/ConsumoInterno.php">Carga Consumo Interno Tigo</a>
                         <br><br>
 
-                        <a class="btn btn-outline-success" data-mdb-ripple-color="dark" href="views/ReporteView.php">Generar Reporte</a>
+
+                        <style>
+                            .btn-outline-success {
+                             
+                              border-color: green;
+                              box-shadow: 0 0.1875rem 0.1875rem 0 rgba(139, 255, 115, 0.87) !important;
+                            }
+                            </style>
+                        <a id="gene" class="btn btn-outline-success" data-mdb-ripple-color="dark" href="views/ReporteView.php">Generar Reporte</a>
+
+
+ 
+
+
+
+
+
+
                         <br><br>
                         <h2 class="text-white-50 mx-auto mt-2 mb-5">Recuerde que el cargue de archivos se realizará únicamente con archivos que tengan la extensión .CSV</h2>
                     </div>

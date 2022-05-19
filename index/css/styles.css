@@ -3385,6 +3385,10 @@ textarea.form-control-lg {
 .btn-outline-success {
   color: #0c9308;
   border-color: #0c9308;
+  border-top-color: rgb(12, 147, 8);
+border-right-color: rgb(12, 147, 8);
+border-bottom-color: rgb(12, 147, 8);
+border-left-color: rgb(12, 147, 8);
 }
 .btn-outline-success:hover {
   color: #000;
@@ -11553,7 +11557,7 @@ body {
   font-size: 80%;
   text-transform: uppercase;
   letter-spacing: 0.15rem;
-  border: 0;
+  border: 3;
 }
 
 .masthead {

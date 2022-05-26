@@ -47,20 +47,87 @@ $(function(){
                         console.log("ESPERANDO RESPUESTA DEL SERVIDOR");
                         $("#esperando").addClass('preloader_r');
                     },
+
+                    //RESPUESTA DEL SERVIDOR PARA DESPLEGAR VENTANA MODAL CON MENSAJE DE RESPUESTA DESDE EL SERVIDOR
                     success: function(data){
-                        //var respuesta = JSON.parse(data);
-                        //console.log("MENSAJE = "+respuesta.mensaje);
-                        //$("#mensaje").text(respuesta.mensaje);
-                        //$("#respuesta").prop('style','display: block');
-                        /*CODIGO QUE PERMITE DESCARGAR EL ARCHIVO DE EXCEL*/
-                        //alert("peticion exitosa");
-                        console.log("data = "+data);
-                        window.open(data,'_blank');
-                        //alert("redireccionado");
+                        var respuesta = JSON.parse(data);
+                        console.log("mensaje = "+respuesta.mensaje);
+                        $("#mensaje").text(respuesta.mensaje);
+                        $("#respuesta").prop('style','display: block');
                         $("#esperando").removeClass('preloader_r');
                         $("#fecha_desde").val('');
                         $("#fecha_hasta").val('');
                     },
+                    /*
+                    //OPCION 1 => RESPUESTA DEL SERVIDOR PARA DESCARGAR ARCHIVO
+                    success: function(response){
+                        console.log("response = "+response.data);
+                        format = "xlsx";
+                        var linkSource = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'+ response.data ;
+                        var downloadLink = document.createElement("a");
+                        var fileName = 'pruebareporte.' + format;
+                        downloadLink.href = linkSource;
+                        downloadLink.download = fileName;
+                        downloadLink.click();
+                        $("#esperando").removeClass('preloader_r');
+                        $("#fecha_desde").val('');
+                        $("#fecha_hasta").val('');
+                    },*/
+                    /*
+                    //OPCION 2 => RESPUESTA DEL SERVIDOR PARA DESCARGAR ARCHIVO
+                    success: function(data){
+                        console.log("data = "+data);
+                        var blob=new Blob([data]);
+                        var link=document.createElement('a');
+                        link.href=window.URL.createObjectURL(blob);
+                        link.download="Reporte_consumos_periodo.xlsx";
+                        link.click();
+                        $("#esperando").removeClass('preloader_r');
+                        $("#fecha_desde").val('');
+                        $("#fecha_hasta").val('');
+                    },*/
+                    /*
+                    //OPCION 3 => RESPUESTA DEL SERVIDOR PARA DESCARGAR ARCHIVO
+                    success: function(response, status, xhr){
+                        // check for a filename
+                        var filename = "";
+                        var disposition = xhr.getResponseHeader('Content-Disposition');
+                        if (disposition && disposition.indexOf('attachment') !== -1) {
+                            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                            var matches = filenameRegex.exec(disposition);
+
+                            if (matches != null && matches[1])
+                                filename = matches[1].replace(/['"]/g, '');
+                        }
+
+                        var type = xhr.getResponseHeader('Content-Type');
+                        var blob = new Blob([response], { type: type });
+
+                        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                            window.navigator.msSaveBlob(blob, filename);
+                        } else {
+                            var URL = window.URL || window.webkitURL;
+                            var downloadUrl = URL.createObjectURL(blob);
+
+                            if (filename) {
+                                var a = document.createElement("a");
+
+                                if (typeof a.download === 'undefined') {
+                                    window.location = downloadUrl;
+                                } else {
+                                    a.href = downloadUrl;
+                                    a.download = filename;
+                                    document.body.appendChild(a);
+                                    a.click(); }
+                            } else {
+                                window.location = downloadUrl;
+                            }
+                            setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100);
+                        }
+                        $("#esperando").removeClass('preloader_r');
+                        $("#fecha_desde").val('');
+                        $("#fecha_hasta").val('');
+                    },*/
                     error: function(){
                         mensaje = "Error de conexion con el servidor de la aplicacion";
                         $("#mensaje").text(mensaje);

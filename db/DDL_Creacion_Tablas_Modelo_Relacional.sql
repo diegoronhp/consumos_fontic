@@ -138,6 +138,26 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 
+-- -----------------------------------------------------
+-- Table `total_consumos_lineas`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `total_consumos_lineas` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `total_consumos_lineas` (
+  `id_total_consumos` INT NOT NULL AUTO_INCREMENT,
+  `total_consumo_datos` DOUBLE NOT NULL,
+  `total_consumo_voz` DOUBLE NOT NULL,
+  `fecha_consumo` DATE NOT NULL,
+  `numero_linea` BIGINT NOT NULL,
+  PRIMARY KEY (`id_total_consumos`),
+  FOREIGN KEY (`numero_linea`) REFERENCES `lineas_registradas`(`numero_linea`)
+)
+ENGINE = InnoDB;
+
+SHOW WARNINGS;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

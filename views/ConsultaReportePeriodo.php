@@ -18,7 +18,7 @@ if((isset($_POST["fecha_desde"]))&&(isset($_POST["fecha_hasta"]))){
     $objeto = generarEncabezadosArchivo($fecha_desde,$fecha_hasta);
     $encabezado = $objeto[0];
     $rangos_fechas = $objeto[1];
-    $resultado = consultarConsumosRangoFechas($fecha_desde,$fecha_hasta);
+    $resultado = consultarLineasConsumosRangoFechas($fecha_desde,$fecha_hasta);
     $writer = new Xlsx($documento);
     $Consumos->fromArray($encabezado, null, 'A1');
     $Consumos = escribirConsumosDocumento($resultado,$Consumos,$rangos_fechas,$fecha_desde,$fecha_hasta);

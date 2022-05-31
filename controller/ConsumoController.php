@@ -380,7 +380,7 @@ function registrar_consumo_datos_linea_tigo($numero,$fecha,$consumo_datos,$id_ar
     //echo "fecha = ".$fecha."<br>";
     //echo "consumo_datos = ".$consumo_datos."<br>";
     //echo "id_archivo = ".$id_archivo."<br>";
-    $registrado = false;
+    $registrado_consumo = false;
     $query = "SELECT id_consumo, cantidad_consumo FROM consumos_datos WHERE numero_linea = '".$numero."' AND fecha_consumo = '".$fecha."' AND id_archivo_tigo_dash = '".$id_archivo."' ORDER BY id_consumo DESC LIMIT 1";
     //echo "CON ESTE QUERY COMPRUEBO SI HAY UN REGISTRO PREVIO DE CONSUMO DE DATOS DENTRO DE ESTE ARCHIVO PARA ESTA LINEA EN LA MISMA FECHA"."<br>";
     //echo "query = ".$query."<br>";
@@ -397,14 +397,92 @@ function registrar_consumo_datos_linea_tigo($numero,$fecha,$consumo_datos,$id_ar
         //echo "old_consumo = ".$old_consumo."<br>";
         //echo "LUEGO HAGO LA SUMATORIA DE LOS DOS CONSUMOS DE DATOS Y OBTENGO EL RESULTADO: "."";
         //echo "nvo_consumo = ".$nvo_consumo."<br>";
-        $registrado = actualizar_consumo_datos($id_consumo,$nvo_consumo,$obj_consumo);
+        $registrado_consumo = actualizar_consumo_datos($id_consumo,$nvo_consumo,$obj_consumo);
     }else{
         //echo "**NO** HAY UN REGISTRO PREVIO DE CONSUMO DE DATOS PARA ESTA LINEA EN ESTA FECHA EN EL CONTENIDO DE ESTE ARCHIVO, POR LO TANTO DEBO INSERTAR UN NUEVO REGISTRO DE CONSUMO"."<br>";
-        $registrado = insertar_consumo_datos($numero,$fecha,$consumo_datos,$id_archivo,$obj_consumo);
+        $registrado_consumo = insertar_consumo_datos($numero,$fecha,$consumo_datos,$id_archivo,$obj_consumo);
     }
 
-    return $registrado;
+    registrar_consumo_total_datos($numero,$fecha,$consumo_datos,$obj_consumo);
+
+    return $registrado_consumo;
 }
+
+
+function registrar_consumo_total_datos($numero,$fecha,$consumo_datos,$obj_consumo){
+    //echo "ENTRO AL METODO registrar_consumo_total_datos"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
+    //echo "numero = ".$numero."<br>";
+    //echo "fecha = ".$fecha."<br>";
+    //echo "consumo_datos = ".$consumo_datos."<br>";
+    //$registrado_total = false;
+    $query = "SELECT id_total_consumos, total_consumo_datos FROM total_consumos_lineas WHERE numero_linea = '".$numero."' AND fecha_consumo = '".$fecha."'";
+    //echo "CON ESTE QUERY COMPRUEBO SI HAY UN REGISTRO **TOTAL** DE CONSUMO DE DATOS PARA ESTA LINEA EN ESTA FECHA"."<br>";
+    //echo "query = ".$query."<br>";
+    $resultado = $obj_consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $obj_consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        //echo "**SI** HAY UN REGISTRO PREVIO DE CONSUMO **TOTAL** DE DATOS PARA ESTA LINEA EN ESTA FECHA, POR LO TANTO DEBO ACTUALIZAR ESE REGISTRO DE CONSUMO CON EL NUEVO CONSUMO CALCULADO"."<br>";
+        $id_consumo_total = $resultado['id_total_consumos'];
+        $old_consumo_total = $resultado['total_consumo_datos'];
+        $nvo_consumo_total = doubleval($old_consumo_total + $consumo_datos);
+        //echo "LOS DATOS DEL REGISTRO ENCONTRADO SON: "."<br>";
+        //echo "id_consumo = ".$id_consumo_total."<br>";
+        //echo "old_consumo = ".$old_consumo_total."<br>";
+        //echo "LUEGO HAGO LA SUMATORIA DE LOS DOS CONSUMOS DE DATOS Y OBTENGO EL RESULTADO: "."";
+        //echo "nvo_consumo = ".$nvo_consumo_total."<br>";
+        actualizar_consumo_total_datos($id_consumo_total,$nvo_consumo_total,$obj_consumo);
+    }else{
+        //echo "**NO** HAY UN REGISTRO PREVIO DE CONSUMO **TOTAL** DE DATOS PARA ESTA LINEA EN ESTA FECHA, POR LO TANTO DEBO INSERTAR UN NUEVO REGISTRO DE CONSUMO **TOTAL**"."<br>";
+        insertar_consumo_total_datos($numero,$fecha,$consumo_datos,$obj_consumo);
+    }
+}
+
+
+function insertar_consumo_total_datos($numero,$fecha,$nvo_consumo,$obj_consumo){
+    //echo "ENTRO AL METODO insertar_consumo_total_datos"."<br>";
+    //echo "RECIBO LAS VARIABLES:"."<br>";
+    //echo "numero = ".$numero."<br>";
+    //echo "fecha = ".$fecha."<br>";
+    //echo "nvo_consumo = ".$nvo_consumo."<br>";
+    //$insertado = false;
+    $query = "INSERT INTO total_consumos_lineas(total_consumo_datos,fecha_consumo,numero_linea) VALUES('".$nvo_consumo."','".$fecha."',".$numero.")";
+    //echo "query = ".$query;
+
+    $resultado = $obj_consumo->insertar($query);
+
+    //if($resultado){
+    //    $insertado = true;
+    //}
+
+    //echo "INSERTADO? ";
+    //echo $insertado == true ? "TRUE"."<br>":"FALSE"."<br>";
+
+    //return $insertado;
+}
+
+
+function actualizar_consumo_total_datos($id,$nvo_consumo,$obj_consumo){
+    //echo "ENTRO AL METODO actualizar_consumo_total_datos"."<br>";
+    //echo "RECIBO LAS VARIABLES:"."<br>";
+    //echo "id = ".$id."<br>";
+    //echo "nvo_consumo = ".$nvo_consumo."<br>";
+    //$actualizado = false;
+    $query = "UPDATE total_consumos_lineas SET total_consumo_datos = '".$nvo_consumo."' WHERE id_total_consumos = '".$id."'";
+    //echo "query = ".$query."<br>";
+    $resultado = $obj_consumo->actualizar($query);
+
+    //if($resultado){
+    //    $actualizado = true;
+    //}
+
+    //echo "ACTUALIZADO? ";
+    //echo $actualizado == true ? "TRUE"."<br>":"FALSE"."<br>";
+
+    //return $actualizado;
+}
+
 
 function registrar_consumo_voz_linea_tigo($numero,$fecha,$consumo_voz,$id_archivo,$obj_consumo){
     //echo "ENTRO AL METODO registrar_consumo_voz_linea_tigo"."<br>";
@@ -413,7 +491,7 @@ function registrar_consumo_voz_linea_tigo($numero,$fecha,$consumo_voz,$id_archiv
     //echo "fecha = ".$fecha."<br>";
     //echo "consumo_voz = ".$consumo_voz."<br>";
     //echo "id_archivo = ".$id_archivo."<br>";
-    $registrado = false;
+    $registrado_consumo = false;
     $query = "SELECT id_consumo, cantidad_consumo FROM consumos_voz WHERE numero_linea = '".$numero."' AND fecha_consumo = '".$fecha."' AND id_archivo_tigo_dash = '".$id_archivo."' ORDER BY id_consumo DESC LIMIT 1";
     //echo "CON ESTE QUERY COMPRUEBO SI HAY UN REGISTRO PREVIO DE CONSUMO DE VOZ DENTRO DE ESTE ARCHIVO PARA ESTA LINEA EN LA MISMA FECHA"."<br>";
     //echo "query = ".$query."<br>";
@@ -430,13 +508,92 @@ function registrar_consumo_voz_linea_tigo($numero,$fecha,$consumo_voz,$id_archiv
         //echo "old_consumo = ".$old_consumo."<br>";
         //echo "LUEGO HAGO LA SUMATORIA DE LOS DOS CONSUMOS DE VOZ Y OBTENGO EL RESULTADO: "."";
         //echo "nvo_consumo = ".$nvo_consumo."<br>";
-        $registrado = actualizar_consumo_voz($id_consumo,$nvo_consumo,$obj_consumo);
+        $registrado_consumo = actualizar_consumo_voz($id_consumo,$nvo_consumo,$obj_consumo);
     }else{
         //echo "**NO** HAY UN REGISTRO PREVIO DE CONSUMO DE VOZ PARA ESTA LINEA EN ESTA FECHA EN EL CONTENIDO DE ESTE ARCHIVO, POR LO TANTO DEBO INSERTAR UN NUEVO REGISTRO DE CONSUMO"."<br>";
-        $registrado = insertar_consumo_voz($numero,$fecha,$consumo_voz,$id_archivo,$obj_consumo);
+        $registrado_consumo = insertar_consumo_voz($numero,$fecha,$consumo_voz,$id_archivo,$obj_consumo);
     }
 
-    return $registrado;
+    registrar_consumo_total_voz($numero,$fecha,$consumo_voz,$obj_consumo);
+
+    return $registrado_consumo;
+}
+
+
+function registrar_consumo_total_voz($numero,$fecha,$consumo_voz,$obj_consumo){
+    //echo "ENTRO AL METODO registrar_consumo_total_voz"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
+    //echo "numero = ".$numero."<br>";
+    //echo "fecha = ".$fecha."<br>";
+    //echo "consumo_datos = ".$consumo_voz."<br>";
+    //$registrado_total = false;
+    $query = "SELECT id_total_consumos, total_consumo_voz FROM total_consumos_lineas WHERE numero_linea = '".$numero."' AND fecha_consumo = '".$fecha."'";
+    //echo "CON ESTE QUERY COMPRUEBO SI HAY UN REGISTRO **TOTAL** DE CONSUMO DE VOZ PARA ESTA LINEA EN ESTA FECHA"."<br>";
+    //echo "query = ".$query."<br>";
+    $resultado = $obj_consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $obj_consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        //echo "**SI** HAY UN REGISTRO PREVIO DE CONSUMO **TOTAL** DE VOZ PARA ESTA LINEA EN ESTA FECHA, POR LO TANTO DEBO ACTUALIZAR ESE REGISTRO DE CONSUMO CON EL NUEVO CONSUMO CALCULADO"."<br>";
+        $id_consumo_total = $resultado['id_total_consumos'];
+        $old_consumo_total = $resultado['total_consumo_voz'];
+        $nvo_consumo_total = doubleval($old_consumo_total + $consumo_voz);
+        //echo "LOS DATOS DEL REGISTRO ENCONTRADO SON: "."<br>";
+        //echo "id_consumo = ".$id_consumo_total."<br>";
+        //echo "old_consumo = ".$old_consumo_total."<br>";
+        //echo "LUEGO HAGO LA SUMATORIA DE LOS DOS CONSUMOS DE VOZ Y OBTENGO EL RESULTADO: "."";
+        //echo "nvo_consumo = ".$nvo_consumo_total."<br>";
+        actualizar_consumo_total_voz($id_consumo_total,$nvo_consumo_total,$obj_consumo);
+    }else{
+        //echo "**NO** HAY UN REGISTRO PREVIO DE CONSUMO **TOTAL** DE VOZ PARA ESTA LINEA EN ESTA FECHA, POR LO TANTO DEBO INSERTAR UN NUEVO REGISTRO DE CONSUMO **TOTAL**"."<br>";
+        insertar_consumo_total_voz($numero,$fecha,$consumo_voz,$obj_consumo);
+    }
+
+    //return $registrado_total;
+}
+
+
+function insertar_consumo_total_voz($numero,$fecha,$nvo_consumo,$obj_consumo){
+    //echo "ENTRO AL METODO insertar_consumo_total_voz"."<br>";
+    //echo "RECIBO LAS VARIABLES:"."<br>";
+    //echo "numero = ".$numero."<br>";
+    //echo "fecha = ".$fecha."<br>";
+    //echo "nvo_consumo = ".$nvo_consumo."<br>";
+    //$insertado = false;
+    $query = "INSERT INTO total_consumos_lineas(total_consumo_voz,fecha_consumo,numero_linea) VALUES('".$nvo_consumo."','".$fecha."',".$numero.")";
+    //echo "query = ".$query;
+
+    $resultado = $obj_consumo->insertar($query);
+
+    //if($resultado){
+    //    $insertado = true;
+    //}
+
+    //echo "INSERTADO? ";
+    //echo $insertado == true ? "TRUE"."<br>":"FALSE"."<br>";
+
+    //return $insertado;
+}
+
+
+function actualizar_consumo_total_voz($id,$nvo_consumo,$obj_consumo){
+    //echo "ENTRO AL METODO actualizar_consumo_total_voz"."<br>";
+    //echo "RECIBO LAS VARIABLES:"."<br>";
+    //echo "id = ".$id."<br>";
+    //echo "nvo_consumo = ".$nvo_consumo."<br>";
+    //$actualizado = false;
+    $query = "UPDATE total_consumos_lineas SET total_consumo_voz = '".$nvo_consumo."' WHERE id_total_consumos = '".$id."'";
+    //echo "query = ".$query."<br>";
+    $resultado = $obj_consumo->actualizar($query);
+
+    //if($resultado){
+    //    $actualizado = true;
+    //}
+
+    //echo "ACTUALIZADO? ";
+    //echo $actualizado == true ? "TRUE"."<br>":"FALSE"."<br>";
+
+    //return $actualizado;
 }
 
 
@@ -575,7 +732,8 @@ function analizar_contenido_archivo_tigo_dash($ruta_archivo,$id_archivo,$obj_con
             }
             $num_reg++;
         }
-
+        $num_reg = $num_reg - 1;
+        $mensaje .= " Han sido analizados ".$num_reg." registros en el contenido del archivo.";
 
         if($cuenta_insertados_datos > 0){
             $mensaje .= " Han sido insertados ".$cuenta_insertados_datos." registros de consumo de datos.";

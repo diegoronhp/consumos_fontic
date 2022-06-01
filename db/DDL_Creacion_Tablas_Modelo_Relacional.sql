@@ -146,8 +146,8 @@ DROP TABLE IF EXISTS `total_consumos_lineas` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `total_consumos_lineas` (
   `id_total_consumos` INT NOT NULL AUTO_INCREMENT,
-  `total_consumo_datos` DOUBLE NOT NULL,
-  `total_consumo_voz` DOUBLE NOT NULL,
+  `total_consumo_datos` DOUBLE NOT NULL DEFAULT 0,
+  `total_consumo_voz` DOUBLE NOT NULL DEFAULT 0,
   `fecha_consumo` DATE NOT NULL,
   `numero_linea` BIGINT NOT NULL,
   PRIMARY KEY (`id_total_consumos`),

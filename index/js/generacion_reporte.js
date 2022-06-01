@@ -7,7 +7,8 @@ function comprobar_rango_fechas(desde,hasta){
     console.log("fecha_desde = "+Date.parse(fecha_desde));
     console.log("fecha_hasta = "+Date.parse(fecha_hasta));
     var cumple = (Date.parse(fecha_hasta) >= Date.parse(fecha_desde)) ? true : false;
-    console.log("rango cumple ? "+cumple == true ? "true":"false");
+    console.log("rango cumple ? ");
+    console.log(cumple == true ? "true":"false");
     return cumple;
 }
 
@@ -23,15 +24,15 @@ $(function(){
         console.log("fecha_desde = "+fecha_desde);
         console.log("fecha_hasta = "+fecha_hasta);
 
-        //if((fecha_desde == "")&&(fecha_hasta == "")){
-            //mensaje = "Alguno de los campos de fecha se encuentra vacio, por favor complete un rango de fechas para generar el reporte";
-            //console.log(mensaje);
-            //$("#mensaje").text(mensaje);
-            //$("#respuesta").prop('style','display: block');
-        //}else{
-            //var cumple = comprobar_rango_fechas(fecha_desde,fecha_hasta);
+        if((fecha_desde == "")||(fecha_hasta == "")){
+            mensaje = "Alguno de los campos de fecha se encuentra vacio, por favor complete un rango de fechas para generar el reporte";
+            console.log(mensaje);
+            $("#mensaje").text(mensaje);
+            $("#respuesta").prop('style','display: block');
+        }else{
+            var cumple = comprobar_rango_fechas(fecha_desde,fecha_hasta);
 
-            //if(cumple){
+            if(cumple){
                 var datos_form = new FormData;
                 datos_form.append("fecha_desde",fecha_desde);
                 datos_form.append("fecha_hasta",fecha_hasta);
@@ -137,15 +138,15 @@ $(function(){
                         $("#fecha_hasta").val('');
                     }
                 })
-            //}else{
-                //mensaje = "La fecha final ("+fecha_hasta+") debe ser mayor a la fecha inicial ("+fecha_desde+")";
-                //console.log(mensaje);
-                //$("#mensaje").text(mensaje);
-                //$("#respuesta").prop('style','display: block');
-                //$("#fecha_desde").val('');
-                //$("#fecha_hasta").val('');
-            //}
-        //}
+            }else{
+                mensaje = "La fecha final ("+fecha_hasta+") debe ser mayor a la fecha inicial ("+fecha_desde+")";
+                console.log(mensaje);
+                $("#mensaje").text(mensaje);
+                $("#respuesta").prop('style','display: block');
+                $("#fecha_desde").val('');
+                $("#fecha_hasta").val('');
+            }
+        }
     })
 
 })

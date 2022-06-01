@@ -2,6 +2,7 @@
 //error_reporting(E_ALL);
 error_reporting(0);
 
+require '../model/bd/configs.php';
 require_once('../vendor/php-excel-reader/excel_reader2.php');
 require_once('../vendor/SpreadsheetReader.php');
 require '../controller/ConsumoController.php';
@@ -15,15 +16,19 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
     $tipo_insercion = $_POST["tipo_insercion"];
     $tipo_archivo = 0; //ARCHIVO PLATAFORMA
     $tabla_bd = "archivos_tigo";
-    $targetPath = 'C:/wamp64/www/consumos_fontic/importados_tigo/';
-    $targetPath_Rectif = 'C:/wamp64/www/consumos_fontic/importados_tigo_rectif/';
+    $dir_raiz = RAIZ;
+    //$targetPath = 'C:/wamp64/www/consumos_fontic/importados_tigo/';
+    $targetPath = $dir_raiz.'importados_tigo/';
+    //$targetPath_Rectif = 'C:/wamp64/www/consumos_fontic/importados_tigo_rectif/';
+    $targetPath_Rectif = $dir_raiz.'importados_tigo_rectif/';
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
     //echo "nombre_temporal = ".$nombre_temporal."<br>";
     //echo "tipo_insercion = ".$tipo_insercion."<br>";
     //echo "tipo_archivo = ".$tipo_archivo."<br>";
     //echo "tabla_bd = ".$tabla_bd."<br>";
+    //echo "dir_raiz = ".$dir_raiz."<br>";
     //echo "targetPath = ".$targetPath."<br>";
-
+    //echo "targetPath_Rectif = ".$targetPath_Rectif."<br>";
     //echo "ANTES DE LA INTERRUPCION"."<br>";
     sleep(5);
     //echo "DESPUES DE LA INTERRUPCION"."<br>";
@@ -49,7 +54,7 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
                     $movido = move_uploaded_file($nombre_temporal, $ruta_archivo);
                     //echo "EL ARCHIVO HA SIDO MOVIDO? ";
                     //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
-                    $mensaje .= insertar_registros_consumos_archivo($nombre_archivo);
+                    $mensaje .= insertar_registros_consumos_archivo($targetPath,$nombre_archivo);
                     enviar_correo_usuario($mensaje);
                 }else{
                     //echo "EL NUEVO ARCHIVO **NO** FUE INSERTADO EN LA BD";

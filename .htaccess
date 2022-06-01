@@ -1,1 +1,4 @@
-ErrorDocument 404 http://172.20.60.88/consumos_fontic/error/404.html
+ErrorDocument 404 http://172.20.60.88/consumos_fontic/error/401.html
+ErrorDocument 500 http://172.20.60.88/consumos_fontic/error/500.html
+ErrorDocument 401 http://172.20.60.88/consumos_fontic/error/401.html
+ErrorDocument 403 "Sorry can't allow you access today"

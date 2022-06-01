@@ -868,10 +868,10 @@ function actualizar_registro_archivo_dash_tigo($cant_analizados,$cant_rechazados
 }
 
 
-function insertar_registros_consumos_archivo($nombre_archivo){
+function insertar_registros_consumos_archivo($dir_destino,$nombre_archivo){
     //echo "ENTRO AL METODO insertar_registros_consumos_archivo"."<br>";
     $mensaje = "";
-    $dir_destino = 'C:/wamp64/www/consumos_fontic/importados_tigo/';
+    //$dir_destino = 'C:/wamp64/www/consumos_fontic/importados_tigo/';
     date_default_timezone_set("America/Bogota");
     $consumo = new Consumo();
     $id_archivo = consultar_datos_archivo_consumo_tigo($nombre_archivo,$consumo);

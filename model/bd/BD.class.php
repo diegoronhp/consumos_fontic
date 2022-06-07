@@ -91,12 +91,15 @@ class Database {
 
     public function update($query){
         //print_r($query);
-        mysqli_query($this->con, $query);
-
+        //mysqli_query($this->con, $query);
+        $rs=mysqli_query($this->con, $query);
+        return $rs;
     }
 
     public function delete($query){
-        mysqli_query($this->con,$query);
+        //mysqli_query($this->con,$query);
+        $rs=mysqli_query($this->con, $query);
+        return $rs;
     }
 
     public function error(){

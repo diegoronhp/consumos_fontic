@@ -11,6 +11,7 @@ if((isset($_POST["fecha_desde"]))&&(isset($_POST["fecha_hasta"]))){
     $fecha_desde = $_POST["fecha_desde"];
     $fecha_hasta = $_POST["fecha_hasta"];
     $dir_raiz = RAIZ;
+    $dir_destino = "reportes_consumos/";
     //echo "ANTES DE LA INTERRUPCION"."<br>";
     sleep(5);
     //echo "DESPUES DE LA INTERRUPCION"."<br>";
@@ -26,9 +27,9 @@ if((isset($_POST["fecha_desde"]))&&(isset($_POST["fecha_hasta"]))){
     $Consumos->fromArray($encabezado, null, 'A1');
     $Consumos = escribirConsumosDocumento($resultado,$Consumos,$rangos_fechas,$fecha_desde,$fecha_hasta);
     //$ruta = "C:/wamp64/www/consumos_fontic/importados_claro";
-    $ruta = $dir_raiz."importados_claro";
+    $ruta = $dir_raiz.$dir_destino;
     $file = "Reporte_consumos_periodo.xlsx";
-    $ruta_completa = $ruta."/".$file;
+    $ruta_completa = $ruta.$file;
     //echo "ruta_completa = ".$ruta_completa."<br>";
     //file_put_contents($ruta.'/depuracion.txt', ob_get_contents());
     $writer->save($ruta_completa);

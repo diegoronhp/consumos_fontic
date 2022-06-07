@@ -32,7 +32,7 @@ function enviar_correo_usuario($respuesta){
         $mail->Host  = 'relaycorreo.registraduria.gov.co';                    // Servidor SMTP
         $mail->SMTPAuth  = true;                                       // Identificacion SMTP
         $mail->Username  = 'dmmancera@registraduria.gov.co';                  // Usuario SMTP
-        $mail->Password  = 'Changuas66';                  	          // Contraseña SMTP
+        $mail->Password  = 'Changuas77';                  	          // Contraseña SMTP
         //$mail->SMTPSecure = 'tls';
         $mail->Port  = 587;
         $mail->setFrom('dmmancera@registraduria.gov.co', 'Fontic');                // Remitente del correo
@@ -40,6 +40,7 @@ function enviar_correo_usuario($respuesta){
         // Destinatarios
         $mail->addAddress('testcorreotigo@gmail.com', 'Fontic');  // Email y nombre del destinatario
         $mail->addAddress('testcorreotigo@hotmail.com', 'Fontic');
+        $mail->addAddress('mogomez@registraduria.gov.co', 'Fontic');
 
         // Contenido del correo
         $mail->isHTML(true);

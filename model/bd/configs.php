@@ -13,6 +13,6 @@ define("C_ROOT","/help_desk/");
 define("RAIZ","C:/wamp64/www/consumos_fontic/");
 
 //Directorio raiz en Linux
-//define("RAIZ","/data/sites/www/");
+//define("RAIZ","/data/sites/www/consumos_fontic/");
 
 ?>

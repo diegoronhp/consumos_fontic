@@ -417,12 +417,12 @@ function analizar_contenido_archivo_gestion($ruta_archivo,$id_archivo,$tipo_inse
         if($cant_reactivados > 0){
             $mensaje .= " Han sido reactivados ".$cant_reactivados." registros de lineas existentes.";
             $mensaje_notificacion .= " Han sido reactivados ".$cant_reactivados." registros de lineas existentes. Los numeros de las lineas son los siguientes: "."<br>";
-            $mensaje_notificacion .= ordernar_lineas($desactivados)."<br>";
+            $mensaje_notificacion .= ordernar_lineas($reactivados)."<br>";
         }
 
         if($cant_rechazados){
             $mensaje .= " Han sido rechazados ".$cant_rechazados." registros para su gestion. Por favor asegurese que estos datos en el archivo sean consistentes para importarlos de nuevo.";
-            $mensaje_notificacion .= " Han sido rechazados ".$cant_rechazados." registros para su gestion. Por favor asegurese que estos datos en el archivo sean consistentes para importarlos de nuevo. Los numeros de las lineas son los siguientes: ";
+            $mensaje_notificacion .= " Han sido rechazados ".$cant_rechazados." registros para su gestion. Por favor asegurese que estos datos en el archivo sean consistentes para importarlos de nuevo. Los numeros de las lineas son los siguientes: "."<br>";
             $mensaje_notificacion .= ordernar_lineas($rechazados)."<br>";
         }
 

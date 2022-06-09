@@ -97,6 +97,29 @@ ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
+
+-- -----------------------------------------------------
+-- Table `archivos_gestion`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `archivos_gestion` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `archivos_gestion` (
+  `id_archivo_gestion` INT NOT NULL AUTO_INCREMENT,
+  `nombre_archivo` VARCHAR(200) NOT NULL,
+  `fecha_cargue` DATETIME NOT NULL,
+  `fecha_procesamiento` DATETIME,
+  `tipo_insercion` INT NOT NULL,
+  `cantidad_analizados` INT NOT NULL DEFAULT 0,
+  `cantidad_insertados` INT NOT NULL DEFAULT 0,
+  `cantidad_desactivados` INT NOT NULL DEFAULT 0,
+  `cantidad_rechazados` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id_archivo_gestion`)
+)
+  ENGINE = InnoDB;
+
+SHOW WARNINGS;
+
 -- -----------------------------------------------------
 -- Table `consumos_voz`
 -- -----------------------------------------------------

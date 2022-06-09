@@ -16,6 +16,7 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
     $dir_raiz = RAIZ;
     $dir_lineas_nuevas = $dir_raiz.'importados_lineas_nuevas/';
     $dir_lineas_inactivas = $dir_raiz.'importados_lineas_inactivas/';
+    $dir_lineas_reactivas = $dir_raiz.'importados_lineas_reactivas/';
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
     //echo "nombre_temporal = ".$nombre_temporal."<br>";
     //echo "tipo_insercion = ".$tipo_insercion."<br>";
@@ -47,8 +48,9 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
                     //echo "EL ARCHIVO HA SIDO MOVIDO AL DIRECTORIO DE LINEAS NUEVAS ? ";
                     //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
                     $respuestas = gestionar_lineas_registradas($dir_lineas_nuevas,$nombre_archivo,$tipo_insercion);
+                    $mensaje_notificacion = $mensaje.$respuestas[1];
                     $mensaje .= $respuestas[0];
-                    enviar_correo_usuario($respuestas[1]);
+                    enviar_correo_usuario($mensaje_notificacion);
                 }
 
                 //SE VAN A DESACTIVAR LINEAS EXISTENTES CON EL ARCHIVO IMPORTADO
@@ -58,8 +60,21 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
                     //echo "EL ARCHIVO HA SIDO MOVIDO AL DIRECTORIO DE LINEAS INACTIVAS ? ";
                     //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
                     $respuestas = gestionar_lineas_registradas($dir_lineas_inactivas,$nombre_archivo,$tipo_insercion);
+                    $mensaje_notificacion = $mensaje.$respuestas[1];
                     $mensaje .= $respuestas[0];
-                    enviar_correo_usuario($respuestas[1]);
+                    enviar_correo_usuario($mensaje_notificacion);
+                }
+
+                //SE VAN A REACTIVAR LINEAS EXISTENTES CON EL ARCHIVO IMPORTADO
+                if($tipo_insercion == 2){
+                    $ruta_archivo = $dir_lineas_reactivas.$nombre_archivo;
+                    $movido = move_uploaded_file($nombre_temporal, $ruta_archivo);
+                    //echo "EL ARCHIVO HA SIDO MOVIDO AL DIRECTORIO DE LINEAS REACTIVAS ? ";
+                    //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
+                    $respuestas = gestionar_lineas_registradas($dir_lineas_reactivas,$nombre_archivo,$tipo_insercion);
+                    $mensaje_notificacion = $mensaje.$respuestas[1];
+                    $mensaje .= $respuestas[0];
+                    enviar_correo_usuario($mensaje_notificacion);
                 }
 
             }else{

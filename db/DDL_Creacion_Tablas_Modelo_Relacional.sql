@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `archivos_gestion` (
   `cantidad_analizados` INT NOT NULL DEFAULT 0,
   `cantidad_insertados` INT NOT NULL DEFAULT 0,
   `cantidad_desactivados` INT NOT NULL DEFAULT 0,
+  `cantidad_reactivados` INT NOT NULL DEFAULT 0,
   `cantidad_rechazados` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id_archivo_gestion`)
 )

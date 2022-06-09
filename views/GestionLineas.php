@@ -73,6 +73,7 @@
                     <select id="tipo_insercion" name="tipo_insercion" class="btn btn-warning">
                         <option value="0" selected>Agregar Lineas Nuevas &nbsp; &nbsp; &nbsp; &nbsp;</option>
                         <option value="1">Desactivar Lineas</option>
+                        <option value="2">Reactivar Lineas</option>
                     </select>
 
                     <br>

@@ -124,7 +124,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script src="../index/js/scripts.js"></script>
-<script src="../index/js/importacion_consumo.js"></script>
+<script src="../index/js/importacion_lineas.js"></script>
 <!-- // preloads -->
 <script>
     $(window).load(function () {

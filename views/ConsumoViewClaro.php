@@ -2,9 +2,11 @@
 //error_reporting(E_ALL);
 error_reporting(0);
 
+require '../model/bd/configs.php';
 require_once('../vendor/php-excel-reader/excel_reader2.php');
 require_once('../vendor/SpreadsheetReader.php');
 require '../controller/ConsumoController.php';
+require '../views/envio_correos.php';
 
 if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
     //echo "DETECTO EL EVENTO POST DEL FORMULARIO EN EL QUE SE IMPORTA EL ARCHIVO DE CONSUMO"."<br>";
@@ -12,15 +14,19 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
     $nombre_temporal = $_FILES["nombre_archivo"]["tmp_name"];
     $tipo_insercion = $_POST["tipo_insercion"];
     $tabla_bd = "archivos_claro";
-    $targetPath = 'C:/wamp64/www/consumos_fontic/importados_claro/';
-    $targetPath_Rectif = 'C:/wamp64/www/consumos_fontic/importados_claro_rectif/';
-    $extension = ".csv";
+    $dir_raiz = RAIZ;
+    //$targetPath = 'C:/wamp64/www/consumos_fontic/importados_claro/';
+    $targetPath = $dir_raiz."importados_claro/";
+    //$targetPath_Rectif = 'C:/wamp64/www/consumos_fontic/importados_claro_rectif/';
+    $targetPath_Rectif = $dir_raiz."importados_claro_rectif/";
+    //$extension = ".csv";
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
     //echo "nombre_temporal = ".$nombre_temporal."<br>";
     //echo "tipo_insercion = ".$tipo_insercion."<br>";
     //echo "tabla_bd = ".$tabla_bd."<br>";
+    //echo "dir_raiz = ".$dir_raiz."<br>";
     //echo "targetPath = ".$targetPath."<br>";
-
+    //echo "targetPath_Rectif = ".$targetPath_Rectif."<br>";
     //echo "ANTES DE LA INTERRUPCION"."<br>";
     sleep(5);
     //echo "DESPUES DE LA INTERRUPCION"."<br>";
@@ -33,7 +39,7 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
         //SI EL CONTENIDO DEL ARCHIVO VA A SER INSERTADO POR PRIMERA VEZ
         if($tipo_insercion == 0){
             //echo "EL ARCHIVO VA A SER INSERTADO POR PRIMERA VEZ"."<br>";
-            $existe = buscar_nombre_archivo_consumo($nombre_archivo,$tabla_bd);
+            $existe = buscar_nombre_archivo_consumo_claro($nombre_archivo,$tabla_bd);
 
             if($existe == false){
                 //echo "EL ARCHIVO **NO** EXISTE EN LA BD, ENTONCES SE PUEDEN INSERTAR LOS REGISTROS NUEVOS"."<br>";
@@ -41,11 +47,14 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
 
                 if($insertado){
                     //echo "EL NUEVO ARCHIVO **SI** FUE INSERTADO EN LA BD"."<br>";
-                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito";
+                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito.";
                     $ruta_archivo = $targetPath.$nombre_archivo;
+                    //echo "ruta_archivo = ".$ruta_archivo."<br>";
                     $movido = move_uploaded_file($nombre_temporal, $ruta_archivo);
                     //echo "EL ARCHIVO HA SIDO MOVIDO ?";
                     //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
+                    $mensaje .= insertar_registros_consumos_archivo_claro($targetPath,$nombre_archivo,$tipo_insercion);
+                    enviar_correo_usuario($mensaje);
                 }else{
                     //echo "EL NUEVO ARCHIVO **NO** FUE INSERTADO EN LA BD"."<br>";
                     $mensaje = "El archivo (".$nombre_archivo.") no pudo ser insertado en la base de datos, por favor intente de nuevo";

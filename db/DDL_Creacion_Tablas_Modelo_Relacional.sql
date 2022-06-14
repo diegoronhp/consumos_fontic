@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `archivos_claro` (
   `fecha_procesamiento` DATETIME,
   `cantidad_insertados` INT NOT NULL DEFAULT 0,
   `cantidad_analizados` INT NOT NULL DEFAULT 0,
+  `cantidad_rechazados` INT NOT NULL DEFAULT 0,
   `id_inicial` INT NOT NULL DEFAULT 0,
   `id_final` INT NOT NULL DEFAULT 0,
   `tipo_insercion` INT NOT NULL,

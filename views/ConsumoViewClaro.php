@@ -74,21 +74,44 @@ if((isset($_FILES["nombre_archivo"]))&&(isset($_POST["tipo_insercion"]))){
                 $mensaje = "El archivo (".$nombre_archivo.") debe existir en la base de datos para poder rectificar los registros previamente cargados";
             }else{
                 //echo "EL ARCHIVO **SI** EXISTE EN LA BD, POR LO TANTO PUEDO ELIMINAR LOS REGISTROS INSERTADOS PREVIAMENTE CON EL MISMO ARCHIVO"."<br>";
-                $id_ini = $existe[1];
-                $id_fin = $existe[2];
-                //echo "LOS REGISTROS POR ELIMINAR EN LA TABLA DE CONSUMOS ESTAN EN EL RANGO desde = ".$id_ini." / hasta = ".$id_fin."<br>";
-                /*EN ESTE PUNTO SE DEBE IMPLMENTAR UN METO EXCLUSIVO QUE PERMITA ELIMINAR LOS REGISTROS DEL RANGO EN LA RESPECTIVA TABLA DE LA BD*/
-                $insertado = insertar_nombre_archivo_consumo_claro($nombre_archivo,$tipo_insercion);
+                $id_archivo = $existe[1];
+                $id_ini = $existe[2];
+                $id_fin = $existe[3];
+                $tipo_consumo = $existe[4];
+                //echo "LOS REGISTROS POR ELIMINAR EN LA TABLA DE CONSUMOS DE ";
+                //echo $tipo_consumo == 0 ? "DATOS":"VOZ";
+                //echo " ESTAN EN EL RANGO desde = ".$id_ini." / hasta = ".$id_fin."<br>";
+                $ruta_archivo = $targetPath_Rectif.$nombre_archivo;
+                $movido = move_uploaded_file($nombre_temporal, $ruta_archivo);
+                //echo "EL ARCHIVO HA SIDO MOVIDO ? ";
+                //echo $movido == true ? "TRUE"."<br>":"FALSE"."<br>";
+                $coincidentes = comprobar_tipo_consumo_archivo_por_rectificar($ruta_archivo,$tipo_consumo);
 
-                if($insertado){
-                    //echo "EL ARCHIVO RECTIFICADO **SI** FUE INSERTADO EN LA BD";
-                    $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito para su rectificacion";
-                    $ruta_archivo = $targetPath_Rectif.$nombre_archivo;
-                    move_uploaded_file($nombre_temporal, $ruta_archivo);
+                if($coincidentes == true){
+                    //echo "EL CONTENIDO DEL ARCHIVO POR RECTIFICAR ES COINCIDENTE CON EL ARCHIVO PREVIAMENTE IMPORTADO QUE VA A SER RECTIFICADO, DADO QUE AMBOS ARCHIVOS CONTIENEN CONSUMOS DE ";
+                    //echo $tipo_consumo == 0 ? "DATOS"."<br>":"VOZ"."<br>";
+                    $rectificacion = eliminar_registros_por_rectificar_archivo_claro($id_ini,$id_fin,$tipo_consumo,$id_archivo);
+                    $insertado = insertar_nombre_archivo_consumo_claro_rectificado($nombre_archivo,$tipo_insercion,$tipo_consumo);
+
+                    if($insertado){
+                        //echo "EL ARCHIVO RECTIFICADO **SI** FUE INSERTADO EN LA BD"."<br>";
+                        $mensaje = "El archivo (".$nombre_archivo.") ha sido importado con exito para su rectificacion. Las estadisticas de la importacion de este archivo son las siguientes: ";
+                        $mensaje .= $rectificacion;
+                        $mensaje .= insertar_registros_consumos_archivo_claro($targetPath_Rectif,$nombre_archivo,$tipo_insercion);
+                        enviar_correo_usuario($mensaje);
+                    }else{
+                        //echo "EL ARCHIVO RECTIFICADO **NO** FUE INSERTADO EN LA BD"."<br>";
+                        $mensaje = "El archivo (".$nombre_archivo.") no pudo ser insertado en la base de datos, por favor intente de nuevo";
+                    }
                 }else{
-                    //echo "EL ARCHIVO RECTIFICADO **NO** FUE INSERTADO EN LA BD";
-                    $mensaje = "El archivo (".$nombre_archivo.") no pudo ser insertado en la base de datos, por favor intente de nuevo";
+                    //echo "EL CONTENIDO DEL ARCHIVO RECTIFICADO NO CONTIENE REGISTROS DE CONSUMO DE ";
+                    //echo $tipo_consumo == 0 ? "DATOS":"VOZ";
+                    //echo " QUE SEAN COINCIDENTES CON LOS DE SU IMPORTACION PREVIA"."<br>";
+                    $mensaje .= "El archivo (".$nombre_archivo.") debe almacenar en su contenido consumos de ";
+                    $mensaje .= $tipo_consumo == 0 ? "datos":"voz";
+                    $mensaje .= " para su rectificacion";
                 }
+
             }
         }
     }else{

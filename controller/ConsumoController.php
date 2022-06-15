@@ -72,6 +72,43 @@ function insertar_nombre_archivo_consumo_tigo($nombre_archivo,$tipo_archivo,$tip
 }
 
 
+
+function insertar_nombre_archivo_consumo_claro_rectificado($nombre_archivo,$tipo_insercion,$tipo_consumo){
+    //echo "ENTRO AL METODO insertar_nombre_archivo_consumo_claro_rectificado"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
+    //echo "tipo_insercion = ".$tipo_insercion."<br>";
+    //echo "tipo_consumo = ".$tipo_consumo."<br>";
+    date_default_timezone_set("America/Bogota");
+    $fecha_actual = date("Y-m-d H:i:s");
+    $consumo = new Consumo();
+    $insertado = false;
+
+    $query = "SELECT id_archivo_claro FROM archivos_claro WHERE nombre_archivo LIKE '".$nombre_archivo."' AND tipo_consumo = ".$tipo_consumo." AND tipo_insercion = 1 ORDER BY fecha_cargue DESC LIMIT 1";
+    //echo "CON ESTE QUERY CONSULTO EN LA TABLA archivos_claro DE LA BD SI ESTE ARCHIVO HABIA SIDO RECTIFICADO PREVIAMENTE query = ".$query."<br>";
+    $resultado = $consumo->consultar_campos($query);
+    //$num_rows = $consumo->contar_filas($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        //echo "ESTE ARCHIVO **SI** HABIA SIDO RECTIFICADO PREVIAMENTE, POR LO QUE NO ES NECESARIO INSERTAR UN NUEVO REGISTRO"."<br>";
+        $insertado = true;
+        $id_archivo_claro = $resultado['id_archivo_claro'];
+        //echo "POR LO TANTO SERA ACTUALIZADO EL REGISTRO CON id_archivo_claro = ".$id_archivo_claro." EN LA TABLA archivos_claro"."<br>";
+    }else{
+        //echo "ESTE ARCHIVO **NO** HA SIDO RECTIFICADO PREVIAMENTE, POR LO QUE PROCEDO A INSERTAR UN NUEVO REGISTRO EN LA TABLA DE LA BD archivos_claro"."<br>";
+        $query = "INSERT INTO archivos_claro(nombre_archivo,tipo_consumo,fecha_cargue,fecha_procesamiento,tipo_insercion) VALUES('".$nombre_archivo."','".$tipo_consumo."','".$fecha_actual."',null,".$tipo_insercion.")";
+        //echo "query = ".$query."<br>";
+        $resultado = $consumo->insertar($query);
+
+        if($resultado){
+            $insertado = true;
+        }
+    }
+    return $insertado;
+}
+
+
+
 function insertar_nombre_archivo_consumo_tigo_rectificado($nombre_archivo,$tipo_archivo,$tipo_insercion){
     //echo "ENTRO AL METODO insertar_nombre_archivo_consumo_tigo_rectificado"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
@@ -86,7 +123,7 @@ function insertar_nombre_archivo_consumo_tigo_rectificado($nombre_archivo,$tipo_
     $query = "SELECT id_archivo_plataforma FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."' and tipo_insercion = 1 ORDER BY fecha_cargue DESC LIMIT 1";
     //echo "CON ESTE QUERY CONSULTO EN LA TABLA archivos_tigo DE LA BD SI ESTE ARCHIVO HABIA SIDO RECTIFICADO PREVIAMENTE query = ".$query."<br>";
     $resultado = $consumo->consultar_campos($query);
-    $num_rows = $consumo->contar_filas($query);
+    //$num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
@@ -171,10 +208,11 @@ function buscar_nombre_archivo_consumo_claro_rectificar($nombre_archivo,$tabla_b
     //echo "tabla_bd = ".$tabla_bd."<br>";
     $consumo = new Consumo();
     $existe = false;
+    $id_archivo = "";
     $id_inicial = "";
     $id_final = "";
-
-    $query = "SELECT id_inicial, id_final FROM ".$tabla_bd." WHERE nombre_archivo LIKE '".$nombre_archivo."%' ORDER BY fecha_cargue DESC LIMIT 1";
+    $tipo_consumo = "";
+    $query = "SELECT id_archivo_claro, id_inicial, id_final, tipo_consumo FROM ".$tabla_bd." WHERE nombre_archivo LIKE '".$nombre_archivo."%' ORDER BY fecha_cargue DESC LIMIT 1";
     //echo "query = ".$query."<br>";
     $resultado = $consumo->consultar_campos($query);
     //$num_rows = $consumo->contar_filas($query);
@@ -182,14 +220,17 @@ function buscar_nombre_archivo_consumo_claro_rectificar($nombre_archivo,$tabla_b
 
     if($num_rows > 0){
         $existe = true;
+        $id_archivo = $resultado['id_archivo_claro'];
         $id_inicial = $resultado['id_inicial'];
         $id_final = $resultado['id_final'];
+        $tipo_consumo = $resultado['tipo_consumo'];
     }
     //echo "EXISTE ARCHIVO ".$nombre_archivo.": ";
     //echo $existe == true ? "TRUE"."<br>": "FALSE"."<br>";
     //echo "id_inicial = ".$id_inicial."<br>";
     //echo "id_final = ".$id_final."<br>";
-    $respuesta = array($existe,$id_inicial,$id_final);
+    //echo "tipo_consumo = ".$tipo_consumo."<br>";
+    $respuesta = array($existe,$id_archivo,$id_inicial,$id_final,$tipo_consumo);
     return $respuesta;
 }
 
@@ -498,7 +539,7 @@ function insertar_consumo_datos_claro($numero,$fecha,$nvo_consumo,$id_archivo,$o
     //echo "id_archivo = ".$id_archivo."<br>";
     $insertado = false;
     $query = "INSERT INTO consumos_datos(cantidad_consumo,fecha_consumo,numero_linea,id_archivo_claro) VALUES('".$nvo_consumo."','".$fecha."',".$numero.",'".$id_archivo."')";
-    //echo "query = ".$query;
+    //echo "query = ".$query."<br>";
 
     $resultado = $obj_consumo->insertar($query);
 
@@ -1133,10 +1174,51 @@ function analizar_contenido_archivo_claro($ruta_archivo,$id_archivo,$tipo_inserc
         }
     }else{
         //ELIMINAR EL ARCHIVO DE LA BD Y DE LA CARPETA EN DONDE QUEDO ALMACENADO
-        eliminar_registro_archivo_tigo_dash($id_archivo,$ruta_archivo,$consumo);
+        eliminar_registro_archivo_claro($id_archivo,$ruta_archivo,$consumo);
     }
 
     return $mensaje;
+}
+
+
+function comprobar_tipo_consumo_archivo_por_rectificar($ruta_archivo,$tipo_consumo){
+    //echo "ENTRO AL METODO comprobar_tipo_consumo_archivo_por_rectificar"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES: "."<br>";
+    //echo "ruta_archivo = ".$ruta_archivo."<br>";
+    //echo "tipo_consumo = ".$tipo_consumo."<br>";
+    $coincidentes = false;
+    $tipo_consumo_archivo = "";
+    $consumo = new Consumo();
+    $conexion = $consumo->get_conection();
+    $Reader = new SpreadsheetReader($ruta_archivo);
+    $sheetCount = count($Reader->sheets());
+
+    //echo "COMIENZO A LEER EL CONTENIDO DEL ARCHIVO:"."<br>";
+    for ($i = 0; $i < $sheetCount; $i++){
+        $Reader->ChangeSheet($i);
+        foreach ($Reader as $Row){
+            if(isset($Row[2])) {
+                $encabezado = mysqli_real_escape_string($conexion, $Row[2]);
+                //echo "Encabezado = ".$encabezado."<br>";
+                if($encabezado == "CONSUMO_DE_VOZ_EN_SEG"){
+                    //echo "EL ARCHIVO ".$ruta_archivo." CONTIENE CONSUMOS DE VOZ"."<br>";
+                    $tipo_consumo_archivo = 1;
+                    break;
+                }
+                if($encabezado == "CONSUMO_DE_DATOS_EN_MB"){
+                    //echo "EL ARCHIVO ".$ruta_archivo." CONTIENE CONSUMOS DE DATOS"."<br>";
+                    $tipo_consumo_archivo = 0;
+                    break;
+                }
+            }
+        }
+    }
+    if($tipo_consumo_archivo == $tipo_consumo){
+        $coincidentes = true;
+    }
+    //echo "ARCHIVOS COINCIDENTES ? ";
+    //echo $coincidentes == true ? "TRUE"."<br>":"FALSE"."<br>";
+    return $coincidentes;
 }
 
 
@@ -1289,6 +1371,29 @@ function analizar_contenido_archivo_tigo_dash($ruta_archivo,$id_archivo,$tipo_in
     }
 
     return $mensaje;
+}
+
+
+function eliminar_registro_archivo_claro($id_archivo,$ruta,$obj_consumo){
+    //echo "ENTRO AL METODO eliminar_registro_archivo_claro"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES: "."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $eliminado = false;
+    $eliminada_ruta = false;
+    $query = "DELETE FROM archivos_claro WHERE id_archivo_claro = '".$id_archivo."'";
+    //echo "query = ".$query."<br>";
+    $resultado = $obj_consumo->eliminar($query);
+
+    if($resultado){
+        $eliminado = true;
+    }
+
+    //echo "ELIMINADO ? ";
+    //echo $eliminado == true ? "TRUE"."<br>":"FALSE"."<br>";
+
+    $eliminada_ruta = unlink($ruta);
+    //echo "ELIMINADA RUTA ? ";
+    //echo $eliminada_ruta == true ? "TRUE"."<br>":"FALSE"."<br>";
 }
 
 
@@ -1522,6 +1627,7 @@ function insertar_registros_consumos_archivo_claro($dir_destino,$nombre_archivo,
     $id_archivo = consultar_datos_archivo_consumo_claro($nombre_archivo,$tipo_insercion);
 
     if($id_archivo > 0){
+        //echo "ENCONTRE EL id_archivo = ".$id_archivo."<br>";
         $ruta_archivo = $dir_destino.$nombre_archivo;
         $mensaje = analizar_contenido_archivo_claro($ruta_archivo,$id_archivo,$tipo_insercion);
     }
@@ -1550,8 +1656,35 @@ function insertar_registros_consumos_archivo($dir_destino,$nombre_archivo,$tipo_
 }
 
 
+function consultar_consumo_datos_claro_por_eliminar($id_consumo,$id_archivo){
+    //echo "ENTRO AL METODO consultar_consumo_datos_claro_por_eliminar"."<br>";
+    //echo "id_consumo = ".$id_consumo."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $query = "SELECT cantidad_consumo, fecha_consumo, numero_linea FROM consumos_datos WHERE id_consumo = ".$id_consumo." AND id_archivo_claro = ".$id_archivo."";
+    //echo "query = ".$query."<br>";
+    $consumo = new Consumo();
+    $respuesta = array();
+    $cantidad_consumo = 0;
+    $fecha_consumo = "";
+    $numero_linea = "";
+    $resultado = $consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        $cantidad_consumo = $resultado['cantidad_consumo'];
+        $fecha_consumo = $resultado['fecha_consumo'];
+        $numero_linea = $resultado['numero_linea'];
+    }
+    //echo "cantidad_consumo = ".$cantidad_consumo."<br>";
+    //echo "fecha_consumo = ".$fecha_consumo."<br>";
+    //echo "numero_linea = ".$numero_linea."<br>";
+    array_push($respuesta,$cantidad_consumo,$fecha_consumo,$numero_linea);
+    return $respuesta;
+}
+
+
 function consultar_consumo_datos_tigo_por_eliminar($id_consumo,$id_archivo){
-    //echo "ENTRO AL METODO consultar_consumo_datos_por_eliminar"."<br>";
+    //echo "ENTRO AL METODO consultar_consumo_datos_tigo_por_eliminar"."<br>";
     //echo "id_consumo = ".$id_consumo."<br>";
     //echo "id_archivo = ".$id_archivo."<br>";
     $query = "SELECT cantidad_consumo, fecha_consumo,numero_linea FROM consumos_datos WHERE id_consumo = ".$id_consumo." AND id_archivo_tigo_dash = ".$id_archivo."";
@@ -1578,8 +1711,35 @@ function consultar_consumo_datos_tigo_por_eliminar($id_consumo,$id_archivo){
 }
 
 
+function consultar_consumo_voz_claro_por_eliminar($id_consumo,$id_archivo){
+    //echo "ENTRO AL METODO consultar_consumo_voz_claro_por_eliminar"."<br>";
+    //echo "id_consumo = ".$id_consumo."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $query = "SELECT cantidad_consumo,fecha_consumo,numero_linea FROM consumos_voz WHERE id_consumo = ".$id_consumo." AND id_archivo_claro = ".$id_archivo."";
+    //echo "query = ".$query."<br>";
+    $consumo = new Consumo();
+    $respuesta = array();
+    $cantidad_consumo = 0;
+    $fecha_consumo = "";
+    $numero_linea = "";
+    $resultado = $consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        $cantidad_consumo = $resultado['cantidad_consumo'];
+        $fecha_consumo = $resultado['fecha_consumo'];
+        $numero_linea = $resultado['numero_linea'];
+    }
+    //echo "cantidad_consumo = ".$cantidad_consumo."<br>";
+    //echo "fecha_consumo = ".$fecha_consumo."<br>";
+    //echo "numero_linea = ".$numero_linea."<br>";
+    array_push($respuesta,$cantidad_consumo,$fecha_consumo,$numero_linea);
+    return $respuesta;
+}
+
+
 function consultar_consumo_voz_tigo_por_eliminar($id_consumo,$id_archivo){
-    //echo "ENTRO AL METODO consultar_consumo_voz_por_eliminar"."<br>";
+    //echo "ENTRO AL METODO consultar_consumo_voz_tigo_por_eliminar"."<br>";
     //echo "id_consumo = ".$id_consumo."<br>";
     //echo "id_archivo = ".$id_archivo."<br>";
     $query = "SELECT cantidad_consumo,fecha_consumo,numero_linea FROM consumos_voz WHERE id_consumo = ".$id_consumo." AND id_archivo_tigo_dash = ".$id_archivo."";
@@ -1606,6 +1766,42 @@ function consultar_consumo_voz_tigo_por_eliminar($id_consumo,$id_archivo){
 }
 
 
+function descontar_consumo_datos_claro($eliminado,$cadena_datos){
+    //echo "ENTRO AL METODO descontar_consumo_datos_claro"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES = "."<br>";
+    //echo "cantidad_consumo = ".$cadena_datos[0]."<br>";
+    //echo "fecha_consumo = ".$cadena_datos[1]."<br>";
+    //echo "numero_linea = ".$cadena_datos[2]."<br>";
+    $descontado = false;
+    $query = "SELECT id_total_consumos,total_consumo_datos FROM total_consumos_lineas WHERE fecha_consumo like '".$cadena_datos[1]."' AND numero_linea = '".$cadena_datos[2]."'";
+    //echo "query = ".$query."<br>";
+    $consumo = new Consumo();
+    $resultado = $consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if(($num_rows == 1)&&($eliminado == true)){
+        //echo "EL CONSUMO TOTAL DE DATOS EN ESTE REGISTRO PUEDE SER ACTUALIZADO"."<br>";
+        $id_total = $resultado['id_total_consumos'];
+        $total_consumo_datos = doubleval($resultado['total_consumo_datos']);
+        $consumo_datos = doubleval($cadena_datos[0]);
+        $nvo_consumo = doubleval($total_consumo_datos - $consumo_datos);
+        //echo "AL CONSUMO TOTAL DE DATOS = ".$total_consumo_datos." LE DESCUENTO EL CONSUMO DE DATOS = ".$consumo_datos." Y OBTENGO EL NUEVO CONSUMO TOTAL DE DATOS = ".$nvo_consumo."<br>";
+        $query = "UPDATE total_consumos_lineas SET total_consumo_datos = ".$nvo_consumo." WHERE id_total_consumos = ".$id_total."";
+        //echo "query = ".$query."<br>";
+        $resultado = $consumo->actualizar($query);
+
+        if($resultado){
+            $descontado = true;
+        }
+
+        //echo "DESCONTADO ? ";
+        //echo $descontado == true ? "TRUE"."<br>":"FALSE"."<br>";
+    }
+    return $descontado;
+}
+
+
+
 function descontar_consumo_datos_tigo($eliminado,$cadena_datos){
     //echo "ENTRO AL METODO descontar_consumo_datos_tigo"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES = "."<br>";
@@ -1627,6 +1823,41 @@ function descontar_consumo_datos_tigo($eliminado,$cadena_datos){
         $nvo_consumo = doubleval($total_consumo_datos - $consumo_datos);
         //echo "AL CONSUMO TOTAL DE DATOS = ".$total_consumo_datos." LE DESCUENTO EL CONSUMO DE DATOS = ".$consumo_datos." Y OBTENGO EL NUEVO CONSUMO TOTAL DE DATOS = ".$nvo_consumo."<br>";
         $query = "UPDATE total_consumos_lineas SET total_consumo_datos = ".$nvo_consumo." WHERE id_total_consumos = ".$id_total."";
+        //echo "query = ".$query."<br>";
+        $resultado = $consumo->actualizar($query);
+
+        if($resultado){
+            $descontado = true;
+        }
+
+        //echo "DESCONTADO ? ";
+        //echo $descontado == true ? "TRUE"."<br>":"FALSE"."<br>";
+    }
+    return $descontado;
+}
+
+
+function descontar_consumo_voz_claro($eliminado,$cadena_datos){
+    //echo "ENTRO AL METODO descontar_consumo_voz_claro"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES = "."<br>";
+    //echo "cantidad_consumo = ".$cadena_datos[0]."<br>";
+    //echo "fecha_consumo = ".$cadena_datos[1]."<br>";
+    //echo "numero_linea = ".$cadena_datos[2]."<br>";
+    $descontado = false;
+    $query = "SELECT id_total_consumos,total_consumo_voz FROM total_consumos_lineas WHERE fecha_consumo like '".$cadena_datos[1]."' AND numero_linea = '".$cadena_datos[2]."'";
+    //echo "query = ".$query."<br>";
+    $consumo = new Consumo();
+    $resultado = $consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if(($num_rows == 1)&&($eliminado == true)){
+        //echo "EL CONSUMO TOTAL DE VOZ EN ESTE REGISTRO PUEDE SER ACTUALIZADO"."<br>";
+        $id_total = $resultado['id_total_consumos'];
+        $total_consumo_voz = doubleval($resultado['total_consumo_voz']);
+        $consumo_voz = doubleval($cadena_datos[0]);
+        $nvo_consumo = doubleval($total_consumo_voz - $consumo_voz);
+        //echo "AL CONSUMO TOTAL DE VOZ = ".$total_consumo_voz." LE DESCUENTO EL CONSUMO DE VOZ = ".$consumo_voz." Y OBTENGO EL NUEVO CONSUMO TOTAL DE VOZ = ".$nvo_consumo."<br>";
+        $query = "UPDATE total_consumos_lineas SET total_consumo_voz = ".$nvo_consumo." WHERE id_total_consumos = ".$id_total."";
         //echo "query = ".$query."<br>";
         $resultado = $consumo->actualizar($query);
 
@@ -1676,12 +1907,53 @@ function descontar_consumo_voz_tigo($eliminado,$cadena_datos){
 }
 
 
+function eliminar_consumo_datos_claro($id_consumo,$id_archivo){
+    //echo "ENTRO AL METODO eliminar_consumo_datos_claro"."<br>";
+    //echo "id_consumo = ".$id_consumo."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $eliminado = false;
+    $query = "DELETE FROM consumos_datos WHERE id_consumo = ".$id_consumo." AND id_archivo_claro = ".$id_archivo."";
+    //echo "query = ".$query."<br>";
+    $consumo = new Consumo();
+    $resultado = $consumo->eliminar($query);
+
+    if($resultado){
+        $eliminado = true;
+    }
+
+    //echo "REGISTRO ELIMINADO ? ";
+    //echo $eliminado == true ? "TRUE"."<br>":"FALSE"."<br>";
+    return $eliminado;
+}
+
+
 function eliminar_consumo_datos_tigo($id_consumo,$id_archivo){
     //echo "ENTRO AL METODO eliminar_consumo_datos_tigo"."<br>";
     //echo "id_consumo = ".$id_consumo."<br>";
     //echo "id_archivo = ".$id_archivo."<br>";
     $eliminado = false;
     $query = "DELETE FROM consumos_datos WHERE id_consumo = ".$id_consumo." AND id_archivo_tigo_dash = ".$id_archivo."";
+    //echo "query = ".$query."<br>";
+    $consumo = new Consumo();
+    $resultado = $consumo->eliminar($query);
+
+    if($resultado){
+        $eliminado = true;
+    }
+
+    //echo "REGISTRO ELIMINADO ? "."<br>";
+    //echo $eliminado == true ? "TRUE"."<br>":"FALSE"."<br>";
+    return $eliminado;
+}
+
+
+
+function eliminar_consumo_voz_claro($id_consumo,$id_archivo){
+    //echo "ENTRO AL METODO eliminar_consumo_voz_claro"."<br>";
+    //echo "id_consumo = ".$id_consumo."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $eliminado = false;
+    $query = "DELETE FROM consumos_voz WHERE id_consumo = ".$id_consumo." AND id_archivo_claro = ".$id_archivo."";
     //echo "query = ".$query."<br>";
     $consumo = new Consumo();
     $resultado = $consumo->eliminar($query);
@@ -1714,6 +1986,47 @@ function eliminar_consumo_voz_tigo($id_consumo,$id_archivo){
     //echo "REGISTRO ELIMINADO ? "."<br>";
     //echo $eliminado == true ? "TRUE"."<br>":"FALSE"."<br>";
     return $eliminado;
+}
+
+
+
+function eliminar_registros_por_rectificar_archivo_claro($id_inicial,$id_final,$tipo_consumo,$id_archivo){
+    //echo "ENTRO AL METODO eliminar_registros_por_rectificar_archivo_claro"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES = "."<br>";
+    //echo "id_inicial = ".$id_inicial."<br>";
+    //echo "id_final = ".$id_final."<br>";
+    //echo "tipo_consumo = ".$tipo_consumo."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $descontados = 0;
+    $mensaje = "";
+    //SE DEBEN DESCONTAR CONSUMOS DE DATOS
+    if($tipo_consumo == 0){
+        //echo "EL TIPO DE CONSUMO DEL ARCHIVO ES DE **DATOS**"."<br>";
+        for($i = $id_inicial; $i<= $id_final; $i++){
+            $cadena_datos = consultar_consumo_datos_claro_por_eliminar($i,$id_archivo);
+            $eliminado = eliminar_consumo_datos_claro($i,$id_archivo);
+            $descontado = descontar_consumo_datos_claro($eliminado,$cadena_datos);
+            if($descontado){
+                $descontados++;
+            }
+        }
+        $mensaje = "Han sido eliminados ".$descontados." registros de consumos de datos. ";
+    }
+
+    //SE DEBEN DESCONTAR CONSUMOS DE VOZ
+    if($tipo_consumo == 1){
+        //echo "EL TIPO DE CONSUMO DEL ARCHIVO ES DE **VOZ**"."<br>";
+        for($j = $id_inicial; $j<= $id_final; $j++){
+            $cadena_voz = consultar_consumo_voz_claro_por_eliminar($j,$id_archivo);
+            $eliminado = eliminar_consumo_voz_claro($j,$id_archivo);
+            $descontado = descontar_consumo_voz_claro($eliminado,$cadena_voz);
+            if($descontado){
+                $descontados++;
+            }
+        }
+        $mensaje = "Han sido eliminados ".$descontados." registros de consumos de voz. ";
+    }
+    return $mensaje;
 }
 
 

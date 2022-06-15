@@ -48,7 +48,23 @@ $(function(){
                         console.log("ESPERANDO RESPUESTA DEL SERVIDOR");
                         $("#esperando").addClass('preloader_r');
                     },
+                    //CODIGO PROBADO EN LA VERSION DE LINUX
+                    success: function(data){
+                        var respuesta = JSON.parse(data);
+                        console.log("data = "+data);
+                        var blob=new Blob([data]);
+                        var link=document.createElement('a');
+                        link.click();
+                        //window.location.replace("/reportes_consumos/Reporte_consumos_periodo.xlsx"); //RUTA EN LINUX
+                        window.location.replace("../reportes_consumos/Reporte_consumos_periodo.xlsx");  //RUTA EN WINDOWS
+                        $("#esperando").removeClass('preloader_r');
+                        $("#mensaje").text(respuesta.mensaje);
+                        $("#respuesta").prop('style','display: block');
+                        $("#fecha_desde").val('');
+                        $("#fecha_hasta").val('');
+                    },
 
+                    /*
                     //RESPUESTA DEL SERVIDOR PARA DESPLEGAR VENTANA MODAL CON MENSAJE DE RESPUESTA DESDE EL SERVIDOR
                     success: function(data){
                         var respuesta = JSON.parse(data);
@@ -58,7 +74,7 @@ $(function(){
                         $("#esperando").removeClass('preloader_r');
                         $("#fecha_desde").val('');
                         $("#fecha_hasta").val('');
-                    },
+                    },*/
                     /*
                     //OPCION 1 => RESPUESTA DEL SERVIDOR PARA DESCARGAR ARCHIVO
                     success: function(response){

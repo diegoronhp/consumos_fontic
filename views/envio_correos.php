@@ -32,28 +32,24 @@ function enviar_correo_usuario($respuesta){
         //$mail->Host  = 'relaycorreo.registraduria.gov.co';                    // Servidor SMTP
         $mail->Host  = 'smtp.gmail.com';                                // Servidor SMTP GMAIL
         $mail->SMTPAuth  = true;                                       // Identificacion SMTP
-<<<<<<< HEAD
-        $mail->Username  = 'dmmancera@registraduria.gov.co';                  // Usuario SMTP
-        $mail->Password  = 'Changuas77';                  	          // Contraseña SMTP
-=======
-        //$mail->Username  = 'dmmancera@registraduria.gov.co';                  // Usuario SMTP
+
+
+        //$mail->Username  = 'dmmancera@registraduria.gov.co';             // Usuario SMTP
         $mail->Username  = 'tigofontic@gmail.com';                  // Usuario SMTP FONTIC
         //$mail->Password  = 'Changuas66';                  	          // Contraseña SMTP
-        $mail->Password  = 'FontiGO13@';                  	          // Contraseña SMTP FONTIC
->>>>>>> b14ed7e9d9c5861c18417210e46e607183e3ed52
+        $mail->Password  = 'cwcoyawvhmbbkoyt';                  	      // Contraseña SMTP FONTIC
+
         //$mail->SMTPSecure = 'tls';
         $mail->Port  = 587;
-        //$mail->setFrom('dmmancera@registraduria.gov.co', 'Fontic');                // Remitente del correo
+        //$mail->setFrom('dmmancera@registraduria.gov.co', 'Fontic');      // Remitente del correo
         $mail->setFrom('tigofontic@gmail.com', 'Fontic');                // Remitente del correo FONTIC
 
         // Destinatarios
         $mail->addAddress('testcorreotigo@gmail.com', 'Fontic');  // Email y nombre del destinatario
         $mail->addAddress('testcorreotigo@hotmail.com', 'Fontic');
         $mail->addAddress('mogomez@registraduria.gov.co', 'Fontic');
-<<<<<<< HEAD
-=======
         $mail->addAddress('dmmancera@registraduria.gov.co', 'Fontic');
->>>>>>> b14ed7e9d9c5861c18417210e46e607183e3ed52
+
 
         // Contenido del correo
         $mail->isHTML(true);

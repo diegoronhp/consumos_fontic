@@ -35,7 +35,7 @@ function enviar_correo_usuario($respuesta){
         //$mail->Username  = 'dmmancera@registraduria.gov.co';                  // Usuario SMTP
         $mail->Username  = 'tigofontic@gmail.com';                  // Usuario SMTP FONTIC
         //$mail->Password  = 'Changuas66';                  	          // Contraseña SMTP
-        $mail->Password  = 'FontiGO13@';                  	          // Contraseña SMTP FONTIC
+        $mail->Password  = 'cwcoyawvhmbbkoyt';                  	          // Contraseña SMTP FONTIC
         //$mail->SMTPSecure = 'tls';
         $mail->Port  = 587;
         //$mail->setFrom('dmmancera@registraduria.gov.co', 'Fontic');                // Remitente del correo

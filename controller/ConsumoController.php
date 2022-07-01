@@ -2130,4 +2130,19 @@ function ordenar_archivos_carpeta($directorio){
     return $ordenados;
 }
 
+function modificar_extension_archivo($nombre_archivo,$ubicacion){
+    //echo "ENTRO AL METODO modificar_extension_archivo"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES"."<br>";
+    //echo "nombre_archivo = ".$nombre_archivo."<br>";
+    //echo "ubicacion = ".$ubicacion."<br>";
+    $nombre_modificado = str_replace ( "csv", "txt", $nombre_archivo);
+    $ubicacion_inicial = $ubicacion."/".$nombre_archivo;
+    $ubicacion_final = $ubicacion."/".$nombre_modificado;
+    //echo "DESPUES DE MODIFICAR LAS UBICACIONES DEL ARCHIVO"."<br>";
+    //echo "nombre_modificado = ".$nombre_modificado."<br>";
+    //echo "ubicacion_inicial = ".$ubicacion_inicial."<br>";
+    //echo "ubicacion_final = ".$ubicacion_final."<br>";
+    rename($ubicacion_inicial,$ubicacion_final);
+}
+
 ?>

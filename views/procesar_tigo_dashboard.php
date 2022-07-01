@@ -63,7 +63,8 @@ while($cant_archivos < $limite_archivos){
         $mensaje_email .= "</p>";
         enviar_correo_usuario($mensaje_email);
         copy($origen_rectif.$nombre_archivo,$destino_archivo.$nombre_archivo);
-        unlink($origen_rectif.$nombre_archivo);
+        modificar_extension_archivo($nombre_archivo,$origen_rectif);
+        //unlink($origen_rectif.$nombre_archivo);
     }else{
         //echo "PROCESANDO ARCHIVO nuevo"."<br>";
         $tipo_insercion = 0;
@@ -72,7 +73,8 @@ while($cant_archivos < $limite_archivos){
         $mensaje_email .= "</p>";
         enviar_correo_usuario($mensaje_email);
         copy($origen_nuevos.$nombre_archivo,$destino_archivo.$nombre_archivo);
-        unlink($origen_nuevos.$nombre_archivo);
+        modificar_extension_archivo($nombre_archivo,$origen_nuevos);
+        //unlink($origen_nuevos.$nombre_archivo);
     }
 
     $cant_archivos++;

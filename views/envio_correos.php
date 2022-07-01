@@ -57,6 +57,7 @@ function enviar_correo_usuario($respuesta){
         $mail->Body    = '
         <html>
         <head>
+        <meta charset="utf-8">
         </head>
         <style>
         h1,h2,h3,h4 {text-align: center;}

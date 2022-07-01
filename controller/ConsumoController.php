@@ -7,14 +7,13 @@ require_once('../vendor/php-excel-reader/excel_reader2.php');
 require_once('../vendor/SpreadsheetReader.php');
 
 
-function buscar_nombre_archivo_consumo($nombre_archivo,$tabla_bd){
+function buscar_nombre_archivo_consumo_tigo($nombre_archivo){
     //echo "ENTRO AL METODO buscar_nombre_archivo_consumo"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
-    //echo "tabla_bd = ".$tabla_bd."<br>";
     $consumo = new Consumo();
     $existe = false;
-    $query = "SELECT id_archivo_plataforma FROM ".$tabla_bd." WHERE nombre_archivo LIKE '".$nombre_archivo."%'";
+    $query = "SELECT id_archivo_plataforma FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."%'";
     //echo "query = ".$query."<br>";
     $resultado = $consumo->consultar($query);
     //$num_rows = $consumo->contar_filas($query);
@@ -164,8 +163,9 @@ function insertar_nombre_archivo_consumo_claro($nombre_archivo,$tipo_insercion){
     return $insertado;
 }
 
-function buscar_nombre_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_archivo){
-    //echo "ENTRO AL METODO buscar_nombre_archivo_consumo_tigo_rectificar"."<br>";
+
+function consultar_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_archivo){
+    //echo "ENTRO AL METODO consultar_archivo_consumo_tigo_rectificar"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
     //echo "tipo_archivo = ".$tipo_archivo."<br>";
@@ -177,10 +177,9 @@ function buscar_nombre_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_arc
     $id_final_voz = "";
     $id_archivo = "";
 
-    $query = "SELECT id_archivo_plataforma,id_inicial_voz, id_final_voz, id_inicial_datos, id_final_datos FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."%' AND tipo_archivo = '".$tipo_archivo."' ORDER BY fecha_cargue DESC LIMIT 1";
+    $query = "SELECT id_archivo_plataforma,id_inicial_voz, id_final_voz, id_inicial_datos, id_final_datos FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."%' AND tipo_archivo = '".$tipo_archivo."' and fecha_procesamiento is not null ORDER BY fecha_cargue DESC LIMIT 1";
     //echo "query = ".$query."<br>";
     $resultado = $consumo->consultar_campos($query);
-    $num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
@@ -197,8 +196,30 @@ function buscar_nombre_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_arc
     //echo "id_final_datos = ".$id_final_datos."<br>";
     //echo "id_inicial_voz = ".$id_inicial_voz."<br>";
     //echo "id_final_voz = ".$id_final_voz."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
     $respuesta = array($existe,$id_inicial_datos,$id_final_datos,$id_inicial_voz,$id_final_voz,$id_archivo);
     return $respuesta;
+}
+
+function buscar_nombre_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_archivo){
+    //echo "ENTRO AL METODO buscar_nombre_archivo_consumo_tigo_rectificar"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
+    //echo "nombre_archivo = ".$nombre_archivo."<br>";
+    //echo "tipo_archivo = ".$tipo_archivo."<br>";
+    $consumo = new Consumo();
+    $existe = false;
+
+    $query = "SELECT id_archivo_plataforma FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."%' AND tipo_archivo = '".$tipo_archivo."' ORDER BY fecha_cargue DESC LIMIT 1";
+    //echo "query = ".$query."<br>";
+    $resultado = $consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        $existe = true;
+    }
+    //echo "EXISTE ARCHIVO ".$nombre_archivo.": ";
+    //echo $existe == true ? "TRUE"."<br>": "FALSE"."<br>";
+    return $existe;
 }
 
 function buscar_nombre_archivo_consumo_claro_rectificar($nombre_archivo,$tabla_bd){
@@ -266,7 +287,6 @@ function consultar_datos_archivo_consumo_tigo($nombre_archivo,$tipo_insercion,$o
     //echo "tipo_insercion = ".$tipo_insercion."<br>";
     $id_archivo_plataforma = 0;
     $tipo_archivo = 0;
-    //$tipo_insercion = 0;
     $existe = false;
     $query = "SELECT id_archivo_plataforma FROM archivos_tigo WHERE nombre_archivo like '".$nombre_archivo."%' AND tipo_archivo = '".$tipo_archivo."' AND tipo_insercion = '".$tipo_insercion."'";
     //echo "query = ".$query."<br>";
@@ -1229,6 +1249,7 @@ function analizar_contenido_archivo_tigo_dash($ruta_archivo,$id_archivo,$tipo_in
     //echo "id_archivo = ".$id_archivo."<br>";
     $mensaje = "";
     $num_reg = 0;
+    $archivo_invalido = false;
     $cuenta_insertados_datos = 0;
     $cuenta_insertados_voz = 0;
     $cuenta_rechazados = 0;
@@ -1259,10 +1280,19 @@ function analizar_contenido_archivo_tigo_dash($ruta_archivo,$id_archivo,$tipo_in
                 //echo "Registro = ".$num_reg." => fecha_consumo = ".$fecha_consumo."<br>";
             }
 
-            if($num_linea == "MSISDN_DD"){
-                $num_reg++;
-                continue;
+            if($num_reg == 0){
+                if($num_linea == "MSISDN_DD"){
+                    $num_reg++;
+                    continue;
+                }else{
+                    //echo "HA SIDO DETECTADO UN ARCHIVO CON UNA ESTRUCTURA DIFERENTE A LA DEL ARCHIVO REQUERIDO"."<br>";
+                    $archivo_invalido = true;
+                    $mensaje = "<br>El archivo importado no tiene la estructura del archivo requerido, por favor intente con un archivo v&aacute;lido.";
+                    break;
+                }
             }
+
+
 
             if($num_reg == 1){
                 $col_1 = mysqli_real_escape_string($conexion, $Row[15]);
@@ -1272,7 +1302,9 @@ function analizar_contenido_archivo_tigo_dash($ruta_archivo,$id_archivo,$tipo_in
                 $col_5 = mysqli_real_escape_string($conexion, $Row[80]);
 
                 if(($col_1 == "")&&($col_2 == "")&&($col_3 == "")&&($col_4 == "")&&($col_5 == "")){
-                    $mensaje = " El archivo importado se encuentra vacio";
+                    //echo "HA SIDO DETECTADO UN ARCHIVO SIN CONTENIDO"."<br>";
+                    $archivo_invalido = true;
+                    $mensaje = "<br>El archivo importado se encuentra vacio, por favor intente con un archivo con contenido v&aacute;lido";
                     break;
                 }
             }
@@ -1344,22 +1376,26 @@ function analizar_contenido_archivo_tigo_dash($ruta_archivo,$id_archivo,$tipo_in
             }
             $num_reg++;
         }
-        if($tipo_insercion == 0){
-            $mensaje .= " Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo.";
-        }else{
-            $mensaje .= " Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo rectificado.";
+
+        if($archivo_invalido == false){
+            if($tipo_insercion == 0){
+                $mensaje .= "<br>Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo.";
+            }
+            if($tipo_insercion == 1){
+                $mensaje .= "<br>Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo rectificado.";
+            }
+            if($cuenta_insertados_datos > 0){
+                $mensaje .= "<br>Han sido insertados ".$cuenta_insertados_datos." registros de consumo de datos.";
+            }
+            if($cuenta_insertados_voz > 0){
+                $mensaje .= "<br>Han sido insertados ".$cuenta_insertados_voz." registros de consumo de voz.";
+            }
+            if($cuenta_rechazados > 0){
+                $cadena_rechazados = ordernar_rechazados($rechazados);
+                $mensaje .= "<br>Han sido rechazados ".$cuenta_rechazados." registros en las siguientes filas del archivo: ".$cadena_rechazados.".";
+            }
         }
 
-        if($cuenta_insertados_datos > 0){
-            $mensaje .= " Han sido insertados ".$cuenta_insertados_datos." registros de consumo de datos.";
-        }
-        if($cuenta_insertados_voz > 0){
-            $mensaje .= " Han sido insertados ".$cuenta_insertados_voz." registros de consumo de voz.";
-        }
-        if($cuenta_rechazados > 0){
-            $cadena_rechazados = ordernar_rechazados($rechazados);
-            $mensaje .= " Han sido rechazados ".$cuenta_rechazados." registros en las siguientes filas del archivo: ".$cadena_rechazados.".";
-        }
     }
     if(($cuenta_insertados_datos > 0)||($cuenta_insertados_voz > 0)){
         //ACTUALIZAR EL REGISTRO EN LA BD CON LAS ESTADISTICAS OBTENIDAS DURANTE EL ANALISIS DEL ARCHIVO
@@ -2040,7 +2076,7 @@ function eliminar_registros_por_rectificar_archivo_tigo($id_ini_datos,$id_fin_da
     //echo "id_archivo = ".$id_archivo."<br>";
     $descontados_datos = 0;
     $descontados_voz = 0;
-
+    $mensaje = "";
     for($i = $id_ini_datos; $i<= $id_fin_datos; $i++){
         $cadena_datos = consultar_consumo_datos_tigo_por_eliminar($i,$id_archivo);
         $eliminado = eliminar_consumo_datos_tigo($i,$id_archivo);
@@ -2059,9 +2095,39 @@ function eliminar_registros_por_rectificar_archivo_tigo($id_ini_datos,$id_fin_da
         }
     }
 
-    $mensaje = "Han sido eliminados ".$descontados_datos." registros de consumos de datos. Han sido eliminados ".$descontados_voz." registros de consumos de voz. ";
+    //echo "descontados_datos = ".$descontados_datos."<br>";
+    //echo "descontados_voz = ".$descontados_voz."<br>";
+    $mensaje .= "<br>Han sido eliminados ".$descontados_datos." registros de consumos de datos. ";
+    $mensaje .= "<br>Han sido eliminados ".$descontados_voz." registros de consumos de voz. ";
     return $mensaje;
 }
 
+
+function ordenar_archivos_carpeta($directorio){
+    //echo "ENTRO AL METODO ordernar_archivos_carpeta"."<br>";
+    $ordenados = array();
+    if (is_dir($directorio)){
+        if ($dh = opendir($directorio)){
+            while ($archivo = readdir($dh)){
+                if ($archivo=="." || $archivo==".." || is_dir($directorio."/".$archivo)){
+                    echo " ";
+                }else{
+                    $entradas[$archivo] = filemtime($directorio."/".$archivo);
+                }
+            }
+            asort($entradas); // Con ksort($entradas) mostras los menos recientes
+            closedir($dh);
+
+            //echo "ARCHIVOS ORDENADOS"."<br>";
+            foreach ($entradas as $archivo => $timestamp) {
+                //echo date("Y-m-d h:i:s", $timestamp);
+                //echo "<a href=\"$directorio/$archivo\">$directorio/$archivo</a><br>";
+                array_push($ordenados,$archivo);
+            }
+        }
+    }
+    //var_dump($ordenados);
+    return $ordenados;
+}
 
 ?>

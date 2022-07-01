@@ -1,7 +1,7 @@
 <?php
 ob_start();
-error_reporting(E_ALL);
-//error_reporting(0);
+//error_reporting(E_ALL);
+error_reporting(0);
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 require '../model/bd/configs.php';

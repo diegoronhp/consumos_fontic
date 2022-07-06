@@ -28,17 +28,15 @@ function buscar_nombre_archivo_consumo_tigo($nombre_archivo){
 }
 
 
-function buscar_nombre_archivo_consumo_claro($nombre_archivo,$tabla_bd){
+function buscar_nombre_archivo_consumo_claro($nombre_archivo){
     //echo "ENTRO AL METODO buscar_nombre_archivo_consumo_claro"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
-    //echo "tabla_bd = ".$tabla_bd."<br>";
     $consumo = new Consumo();
     $existe = false;
-    $query = "SELECT id_archivo_claro FROM ".$tabla_bd." WHERE nombre_archivo LIKE '".$nombre_archivo."%'";
+    $query = "SELECT id_archivo_claro FROM archivos_claro WHERE nombre_archivo LIKE '".$nombre_archivo."%'";
     //echo "query = ".$query."<br>";
     $resultado = $consumo->consultar($query);
-    //$num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
@@ -85,7 +83,6 @@ function insertar_nombre_archivo_consumo_claro_rectificado($nombre_archivo,$tipo
     $query = "SELECT id_archivo_claro FROM archivos_claro WHERE nombre_archivo LIKE '".$nombre_archivo."' AND tipo_consumo = ".$tipo_consumo." AND tipo_insercion = 1 ORDER BY fecha_cargue DESC LIMIT 1";
     //echo "CON ESTE QUERY CONSULTO EN LA TABLA archivos_claro DE LA BD SI ESTE ARCHIVO HABIA SIDO RECTIFICADO PREVIAMENTE query = ".$query."<br>";
     $resultado = $consumo->consultar_campos($query);
-    //$num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
@@ -94,7 +91,7 @@ function insertar_nombre_archivo_consumo_claro_rectificado($nombre_archivo,$tipo
         $id_archivo_claro = $resultado['id_archivo_claro'];
         //echo "POR LO TANTO SERA ACTUALIZADO EL REGISTRO CON id_archivo_claro = ".$id_archivo_claro." EN LA TABLA archivos_claro"."<br>";
     }else{
-        //echo "ESTE ARCHIVO **NO** HA SIDO RECTIFICADO PREVIAMENTE, POR LO QUE PROCEDO A INSERTAR UN NUEVO REGISTRO EN LA TABLA DE LA BD archivos_claro"."<br>";
+        //echo "ESTE ARCHIVO **NO** HABIA SIDO RECTIFICADO PREVIAMENTE, POR LO QUE PROCEDO A INSERTAR UN NUEVO REGISTRO EN LA TABLA DE LA BD archivos_claro"."<br>";
         $query = "INSERT INTO archivos_claro(nombre_archivo,tipo_consumo,fecha_cargue,fecha_procesamiento,tipo_insercion) VALUES('".$nombre_archivo."','".$tipo_consumo."','".$fecha_actual."',null,".$tipo_insercion.")";
         //echo "query = ".$query."<br>";
         $resultado = $consumo->insertar($query);
@@ -122,7 +119,6 @@ function insertar_nombre_archivo_consumo_tigo_rectificado($nombre_archivo,$tipo_
     $query = "SELECT id_archivo_plataforma FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."' and tipo_insercion = 1 ORDER BY fecha_cargue DESC LIMIT 1";
     //echo "CON ESTE QUERY CONSULTO EN LA TABLA archivos_tigo DE LA BD SI ESTE ARCHIVO HABIA SIDO RECTIFICADO PREVIAMENTE query = ".$query."<br>";
     $resultado = $consumo->consultar_campos($query);
-    //$num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
@@ -162,6 +158,41 @@ function insertar_nombre_archivo_consumo_claro($nombre_archivo,$tipo_insercion){
     }
     return $insertado;
 }
+
+
+function consultar_archivo_consumo_claro_rectificar($nombre_archivo){
+    //echo "ENTRO AL METODO consultar_archivo_consumo_tigo_rectificar"."<br>";
+    //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
+    //echo "nombre_archivo = ".$nombre_archivo."<br>";
+    $consumo = new Consumo();
+    $existe = false;
+    $tipo_consumo = "";
+    $id_inicial = "";
+    $id_final = "";
+    $id_archivo = "";
+
+    $query = "SELECT id_archivo_claro, tipo_consumo, id_inicial, id_final FROM archivos_claro WHERE nombre_archivo LIKE '".$nombre_archivo."%' and fecha_procesamiento is not null ORDER BY fecha_cargue DESC LIMIT 1";
+    //echo "query = ".$query."<br>";
+    $resultado = $consumo->consultar_campos($query);
+    $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
+
+    if($num_rows > 0){
+        $existe = true;
+        $tipo_consumo = $resultado['tipo_consumo'];
+        $id_inicial = $resultado['id_inicial'];
+        $id_final = $resultado['id_final'];
+        $id_archivo = $resultado['id_archivo_claro'];
+    }
+    //echo "EXISTE ARCHIVO ".$nombre_archivo.": ";
+    //echo $existe == true ? "TRUE"."<br>": "FALSE"."<br>";
+    //echo "tipo_consumo = ".$tipo_consumo."<br>";
+    //echo "id_inicial = ".$id_inicial."<br>";
+    //echo "id_final = ".$id_final."<br>";
+    //echo "id_archivo = ".$id_archivo."<br>";
+    $respuesta = array($existe,$tipo_consumo,$id_inicial,$id_final,$id_archivo);
+    return $respuesta;
+}
+
 
 
 function consultar_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_archivo){
@@ -222,36 +253,26 @@ function buscar_nombre_archivo_consumo_tigo_rectificar($nombre_archivo,$tipo_arc
     return $existe;
 }
 
-function buscar_nombre_archivo_consumo_claro_rectificar($nombre_archivo,$tabla_bd){
+function buscar_nombre_archivo_consumo_claro_rectificar($nombre_archivo){
     //echo "ENTRO AL METODO buscar_nombre_archivo_consumo_claro_rectificar"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES:"."<br>";
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
-    //echo "tabla_bd = ".$tabla_bd."<br>";
     $consumo = new Consumo();
     $existe = false;
-    $id_archivo = "";
-    $id_inicial = "";
-    $id_final = "";
     $tipo_consumo = "";
-    $query = "SELECT id_archivo_claro, id_inicial, id_final, tipo_consumo FROM ".$tabla_bd." WHERE nombre_archivo LIKE '".$nombre_archivo."%' ORDER BY fecha_cargue DESC LIMIT 1";
+    $query = "SELECT id_archivo_claro, tipo_consumo FROM archivos_claro WHERE nombre_archivo LIKE '".$nombre_archivo."%' ORDER BY fecha_cargue DESC LIMIT 1";
     //echo "query = ".$query."<br>";
     $resultado = $consumo->consultar_campos($query);
-    //$num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
         $existe = true;
-        $id_archivo = $resultado['id_archivo_claro'];
-        $id_inicial = $resultado['id_inicial'];
-        $id_final = $resultado['id_final'];
         $tipo_consumo = $resultado['tipo_consumo'];
     }
     //echo "EXISTE ARCHIVO ".$nombre_archivo.": ";
     //echo $existe == true ? "TRUE"."<br>": "FALSE"."<br>";
-    //echo "id_inicial = ".$id_inicial."<br>";
-    //echo "id_final = ".$id_final."<br>";
     //echo "tipo_consumo = ".$tipo_consumo."<br>";
-    $respuesta = array($existe,$id_archivo,$id_inicial,$id_final,$tipo_consumo);
+    $respuesta = array($existe,$tipo_consumo);
     return $respuesta;
 }
 
@@ -1040,6 +1061,11 @@ function analizar_contenido_archivo_claro($ruta_archivo,$id_archivo,$tipo_inserc
                         //echo "EL ARCHIVO ".$ruta_archivo." CONTIENE CONSUMOS DE DATOS"."<br>";
                         $archivo_consumos_datos = true;
                     }
+                    if(($archivo_consumos_voz == false)&&($archivo_consumos_datos == false)){
+                        //echo "HA SIDO DETECTADO UN ARCHIVO CON UNA ESTRUCTURA DIFERENTE A LA DEL ARCHIVO REQUERIDO"."<br>";
+                        $mensaje = "<br>El archivo importado no tiene la estructura del archivo requerido, por favor intente con un archivo v&aacute;lido.";
+                        break;
+                    }
                 }
             }else{
                 if($num_reg == 1){
@@ -1048,7 +1074,7 @@ function analizar_contenido_archivo_claro($ruta_archivo,$id_archivo,$tipo_inserc
                     $col_3 = mysqli_real_escape_string($conexion, $Row[3]);
                     $col_4 = mysqli_real_escape_string($conexion, $Row[4]);
                     if(($col_1 == "")&&($col_2 == "")&&($col_3 == "")&&($col_4 == "")){
-                        $mensaje = " El archivo importado se encuentra vacio";
+                        $mensaje = "<br>El archivo importado se encuentra vacio, por favor intente con un archivo con contenido v&aacute;lido";
                         break;
                     }
                 }
@@ -1167,20 +1193,21 @@ function analizar_contenido_archivo_claro($ruta_archivo,$id_archivo,$tipo_inserc
             $num_reg++;
         }
         if($tipo_insercion == 0){
-            $mensaje .= " Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo.";
-        }else{
-            $mensaje .= " Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo rectificado.";
+            $mensaje .= "<br>Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo.";
+        }
+        if($tipo_insercion == 1){
+            $mensaje .= "<br>Han sido analizados ".($num_reg - 1)." registros en el contenido del archivo rectificado.";
         }
 
         if($cuenta_insertados_datos > 0){
-            $mensaje .= " Han sido insertados ".$cuenta_insertados_datos." registros de consumo de datos.";
+            $mensaje .= "<br>Han sido insertados ".$cuenta_insertados_datos." registros de consumo de datos.";
         }
         if($cuenta_insertados_voz > 0){
-            $mensaje .= " Han sido insertados ".$cuenta_insertados_voz." registros de consumo de voz.";
+            $mensaje .= "<br>Han sido insertados ".$cuenta_insertados_voz." registros de consumo de voz.";
         }
         if($cuenta_rechazados > 0){
             $cadena_rechazados = ordernar_rechazados($rechazados);
-            $mensaje .= " Han sido rechazados ".$cuenta_rechazados." registros en las siguientes filas del archivo: ".$cadena_rechazados.".";
+            $mensaje .= "<br>Han sido rechazados ".$cuenta_rechazados." registros en las siguientes filas del archivo: ".$cadena_rechazados.".";
         }
     }
     if(($cuenta_insertados_datos > 0)||($cuenta_insertados_voz > 0)){
@@ -1199,6 +1226,7 @@ function analizar_contenido_archivo_claro($ruta_archivo,$id_archivo,$tipo_inserc
 
     return $mensaje;
 }
+
 
 
 function comprobar_tipo_consumo_archivo_por_rectificar($ruta_archivo,$tipo_consumo){
@@ -1671,8 +1699,8 @@ function insertar_registros_consumos_archivo_claro($dir_destino,$nombre_archivo,
 }
 
 
-function insertar_registros_consumos_archivo($dir_destino,$nombre_archivo,$tipo_insercion){
-    //echo "ENTRO AL METODO insertar_registros_consumos_archivo"."<br>";
+function insertar_registros_consumos_archivo_tigo($dir_destino,$nombre_archivo,$tipo_insercion){
+    //echo "ENTRO AL METODO insertar_registros_consumos_archivo_tigo"."<br>";
     //echo "RECIBO LAS SIGUIENTES VARIABLES: "."<br>";
     //echo "dir_destino = ".$dir_destino."<br>";
     //echo "nombre_archivo = ".$nombre_archivo."<br>";
@@ -2046,7 +2074,7 @@ function eliminar_registros_por_rectificar_archivo_claro($id_inicial,$id_final,$
                 $descontados++;
             }
         }
-        $mensaje = "Han sido eliminados ".$descontados." registros de consumos de datos. ";
+        $mensaje = "<br>Han sido eliminados ".$descontados." registros de consumos de datos.";
     }
 
     //SE DEBEN DESCONTAR CONSUMOS DE VOZ
@@ -2060,7 +2088,7 @@ function eliminar_registros_por_rectificar_archivo_claro($id_inicial,$id_final,$
                 $descontados++;
             }
         }
-        $mensaje = "Han sido eliminados ".$descontados." registros de consumos de voz. ";
+        $mensaje = "<br>Han sido eliminados ".$descontados." registros de consumos de voz.";
     }
     return $mensaje;
 }

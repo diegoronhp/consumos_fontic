@@ -16,7 +16,6 @@ function buscar_nombre_archivo_consumo_tigo($nombre_archivo){
     $query = "SELECT id_archivo_plataforma FROM archivos_tigo WHERE nombre_archivo LIKE '".$nombre_archivo."%'";
     //echo "query = ".$query."<br>";
     $resultado = $consumo->consultar($query);
-    //$num_rows = $consumo->contar_filas($query);
     $num_rows = $resultado == true ? $consumo->contar_filas($query) : 0;
 
     if($num_rows > 0){
@@ -65,6 +64,8 @@ function insertar_nombre_archivo_consumo_tigo($nombre_archivo,$tipo_archivo,$tip
     if($resultado){
         $insertado = true;
     }
+    //echo "INSERTADO ? ";
+    //echo $insertado == true ? "TRUE"."<br>": "FALSE"."<br>";
     return $insertado;
 }
 

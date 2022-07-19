@@ -23,7 +23,7 @@
     <link href="../index/css/styles.css" rel="stylesheet"/>
     <style>
 
-        .preloader_interno {
+        .preloader {
             position: absolute;
             top: 0;
             left: 0;
@@ -48,7 +48,7 @@
 
 <div id="esperando"></div>
 
-<div class="preloader_interno"></div>
+<div class="preloader"></div>
 
 
 <header class="masthead">
@@ -128,7 +128,7 @@
 <!-- // preloads -->
 <script>
     $(window).load(function () {
-        $('.preloader_interno').fadeOut('slow');
+        $('.preloader').fadeOut('slow');
     });
 </script>
 <!-- end preloader cargador-->

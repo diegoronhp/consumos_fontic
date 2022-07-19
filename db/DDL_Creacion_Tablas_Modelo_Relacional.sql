@@ -135,6 +135,7 @@ CREATE TABLE IF NOT EXISTS `consumos_voz` (
   `numero_linea` BIGINT NOT NULL,
   `id_archivo_claro` INT NOT NULL DEFAULT 0,
   `id_archivo_tigo_dash` INT NOT NULL DEFAULT 0,
+  `id_archivo_tigo_interno` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id_consumo`),
   FOREIGN KEY (`numero_linea`) REFERENCES `lineas_registradas`(`numero_linea`)
 )
@@ -155,6 +156,7 @@ CREATE TABLE IF NOT EXISTS `consumos_datos` (
   `numero_linea` BIGINT NOT NULL,
   `id_archivo_claro` INT NOT NULL DEFAULT 0,
   `id_archivo_tigo_dash` INT NOT NULL DEFAULT 0,
+  `id_archivo_tigo_interno` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id_consumo`),
   FOREIGN KEY (`numero_linea`) REFERENCES `lineas_registradas`(`numero_linea`)
 )
